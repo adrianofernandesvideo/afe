@@ -1,0 +1,4 @@
+# quebras de linha iguais em qualquer sistema (o codigo usa LF)
+* text=auto eol=lf
+*.png binary
+*.gif binary

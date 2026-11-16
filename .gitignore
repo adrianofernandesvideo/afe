@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# o que o editor gera ao usar a arte de exemplo (ou outras artes dentro desta pasta)
+.edicoes-anteriores/
+build/
+out/
+exemplo/assets/biblioteca/
+
+# sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# planos e rascunhos privados (nao vao para o GitHub)
+_privado/

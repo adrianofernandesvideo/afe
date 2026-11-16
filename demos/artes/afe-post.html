@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>AFE — post de demonstração</title>
+<!-- Arte de demonstração: a "propaganda" do AFE, feita só com HTML/CSS/SVG (sem fontes nem imagens de fora).
+     Abra no AFE para ver a animação; ela fica em afe-post.edicoes.js, não neste código. -->
+<style>
+  :root { --fundo-profundo: #04041d; --fundo: #140b49; --vidro: rgba(22, 11, 113, .55); --borda-vidro: rgba(61, 245, 255, .25);
+    --ciano: #3df5ff; --rosa: #ff4d82; --magenta: #d501e8; --azul: #10a6ff; --texto: #ffffff; --texto-fraco: #b9aee8; }
+  html, body { margin: 0; background: var(--fundo-profundo); }
+  #post { position: relative; width: 1080px; height: 1350px; overflow: hidden; color: var(--texto);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background:
+      radial-gradient(55% 40% at 50% 38%, rgba(215, 40, 143, .30), transparent 70%),
+      radial-gradient(60% 45% at 85% 95%, rgba(91, 58, 214, .35), transparent 70%),
+      linear-gradient(180deg, var(--fundo-profundo) 0%, var(--fundo) 100%); }
+  .grade { position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(120, 150, 255, .05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(120, 150, 255, .05) 1px, transparent 1px);
+    background-size: 48px 48px; }
+  .losango { position: absolute; width: 320px; height: 320px; border-radius: 52px; rotate: 45deg; }
+  .losango-azul { left: -170px; top: -170px; background: linear-gradient(135deg, var(--azul), #1b2bd6);
+    box-shadow: 0 0 90px 24px rgba(16, 166, 255, .35); }
+  .losango-rosa { right: -170px; top: 1140px; background: linear-gradient(135deg, #e02a5e, #8a1068);
+    box-shadow: 0 0 90px 24px rgba(194, 24, 91, .4); }
+  .traco { position: absolute; height: 8px; border-radius: 4px; }
+  .traco-ciano { right: 80px; top: 120px; width: 120px; background: var(--ciano); }
+  .traco-rosa { left: 0; top: 712px; width: 52px; background: var(--rosa); }
+
+  .selo { position: absolute; left: 80px; top: 78px; padding: 10px 22px; border-radius: 8px;
+    background: rgba(61, 245, 255, .12); border: 2px solid var(--ciano); color: var(--ciano);
+    font-size: 24px; font-weight: 700; letter-spacing: .16em; }
+  .logo { position: absolute; left: 70px; top: 196px; margin: 0; font-size: 290px; line-height: 1; font-weight: 900;
+    font-family: "Segoe UI Black", "Arial Black", system-ui, sans-serif; letter-spacing: -.02em; color: var(--texto);
+    text-shadow: -9px 0 0 var(--magenta), 8px 0 0 var(--ciano), 0 0 50px rgba(61, 245, 255, .45); }
+  .setas { position: absolute; left: 650px; top: 326px; color: var(--rosa); font-size: 80px; font-weight: 900;
+    letter-spacing: -.14em; }
+  .chamada { position: absolute; left: 80px; top: 500px; margin: 0; width: 920px; font-size: 66px; line-height: 1.08;
+    font-weight: 800; }
+  .chamada em { font-style: normal; color: var(--ciano); }
+  .divisor { position: absolute; left: 80px; top: 668px; width: 220px; height: 10px; border-radius: 5px;
+    background: linear-gradient(90deg, var(--rosa), var(--azul)); }
+  .apoio { position: absolute; left: 80px; top: 698px; margin: 0; font-size: 34px; line-height: 1.3; color: var(--texto-fraco); }
+
+  /* o cartão: uma mini arte com a caixa de seleção do AFE em volta de um elemento */
+  .cartao { position: absolute; left: 520px; top: 830px; width: 450px; height: 300px; border-radius: 16px;
+    background: var(--vidro); border: 1px solid var(--borda-vidro);
+    box-shadow: inset 0 0 120px -20px rgba(0, 0, 0, .7), 0 30px 80px -20px rgba(0, 0, 0, .8); }
+  .cartao .bola { position: absolute; left: 44px; top: 50px; width: 120px; height: 120px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--rosa), var(--magenta)); box-shadow: 0 0 50px rgba(215, 40, 143, .6); }
+  .cartao .ola { position: absolute; left: 200px; top: 66px; font-size: 70px; font-weight: 900; }
+  .cartao .linha { position: absolute; left: 200px; height: 14px; border-radius: 7px; background: rgba(185, 174, 232, .3); }
+  .cartao .l1 { top: 168px; width: 200px; } .cartao .l2 { top: 198px; width: 140px; }
+  .cartao .barra { position: absolute; left: 44px; right: 44px; bottom: 40px; height: 16px; border-radius: 8px;
+    background: linear-gradient(90deg, var(--rosa), var(--azul)); }
+  .caixa { position: absolute; left: 30px; top: 36px; width: 148px; height: 148px; border: 3px solid var(--ciano);
+    box-shadow: 0 0 14px rgba(61, 245, 255, .5); }
+  .caixa i { position: absolute; width: 14px; height: 14px; background: var(--texto); border: 3px solid var(--ciano); }
+  .caixa .a1 { left: -10px; top: -10px; } .caixa .a2 { right: -10px; top: -10px; }
+  .caixa .a3 { left: -10px; bottom: -10px; } .caixa .a4 { right: -10px; bottom: -10px; }
+  .caixa .giro { left: 50%; top: -46px; translate: -50% 0; border-radius: 50%; }
+
+  .cursor { position: absolute; left: 690px; top: 970px; width: 64px; height: 64px;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); }
+
+  .recursos { position: absolute; left: 80px; top: 830px; width: 400px; display: flex; flex-direction: column; gap: 18px; }
+  .recurso { padding: 16px 22px; border-radius: 16px; background: var(--vidro); border: 1px solid var(--borda-vidro);
+    font-size: 30px; font-weight: 700; white-space: nowrap; }
+  .recurso b { color: var(--rosa); margin-right: 12px; }
+
+  .rodape { position: absolute; left: 80px; right: 80px; top: 1200px; display: flex; align-items: center; gap: 40px; }
+  .pilula { padding: 16px 34px; border-radius: 16px; background: var(--fundo-profundo); border: 2px solid var(--ciano);
+    color: var(--ciano); font-size: 34px; font-weight: 800;
+    box-shadow: 0 0 0 1px rgba(61, 245, 255, .7), 0 0 14px rgba(61, 245, 255, .3), 0 0 40px 4px rgba(61, 245, 255, .1); }
+  .licenca { font-size: 26px; color: var(--texto-fraco); line-height: 1.35; }
+</style>
+</head>
+<body>
+<div id="post">
+  <div class="grade" data-nome="Grade"></div>
+  <div class="losango losango-azul" data-nome="Losango azul"></div>
+  <div class="losango losango-rosa" data-nome="Losango rosa"></div>
+  <div class="traco traco-ciano" data-nome="Traço ciano"></div>
+  <div class="traco traco-rosa" data-nome="Traço rosa"></div>
+  <span class="selo" data-nome="Selo">CÓDIGO ABERTO</span>
+  <h1 class="logo" data-nome="Logo">AFE</h1>
+  <span class="setas" data-nome="Setas">›››</span>
+  <p class="chamada" data-nome="Chamada">Designs de IA, agora<br>no <em>seu controle</em>.</p>
+  <div class="divisor" data-nome="Divisor"></div>
+  <p class="apoio" data-nome="Apoio">Edite ao vivo, no navegador, as artes HTML<br>que a sua IA criou.</p>
+  <div class="cartao" data-nome="Cartão">
+    <div class="bola" data-nome="Bola"></div>
+    <div class="ola" data-nome="Olá">Olá</div>
+    <div class="linha l1" data-nome="Linha 1"></div><div class="linha l2" data-nome="Linha 2"></div>
+    <div class="barra" data-nome="Barra"></div>
+    <div class="caixa" data-nome="Caixa de seleção"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="a4"></i><i class="giro"></i></div>
+  </div>
+  <svg class="cursor" data-nome="Cursor" viewBox="0 0 32 32"><path d="M5 3 L5 26 L11 20 L15 29 L19 27 L15 18 L23 18 Z" fill="#ffffff" stroke="#04041d" stroke-width="2" stroke-linejoin="round"/></svg>
+  <div class="recursos" data-nome="Recursos">
+    <div class="recurso" data-nome="Recurso: keyframes"><b>◆</b>Keyframes</div>
+    <div class="recurso" data-nome="Recurso: glow"><b>✦</b>Glow e sombras</div>
+    <div class="recurso" data-nome="Recurso: easing"><b>∿</b>Curvas de easing</div>
+    <div class="recurso" data-nome="Recurso: vídeo"><b>▶</b>MP4 + motion blur</div>
+  </div>
+  <div class="rodape" data-nome="Rodapé">
+    <span class="pilula" data-nome="Pílula">Python + seu navegador</span>
+    <span class="licenca" data-nome="Licença">Software livre<br>AGPL-3.0</span>
+  </div>
+</div>
+<script>window.CONFIG = { largura: 1080, altura: 1350, paginas: 1 };</script>
+<script src="afe-post.edicoes.js"></script>
+<script src="edicoes-lib.js" data-auto></script>
+</body>
+</html>

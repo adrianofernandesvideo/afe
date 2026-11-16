@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Arte de exemplo — AFE</title>
+<!-- Arte mínima para testar o editor em qualquer pasta e servir de modelo de como ligar uma arte.
+     Não depende de nada de fora (sem fontes nem imagens externas). Modo AUTOMÁTICO: veja as 2 últimas linhas. -->
+<style>
+  html, body { margin: 0; background: #05050c; }
+  #post { position: relative; width: 1080px; height: 1350px; overflow: hidden; color: #fff;
+    font-family: system-ui, "Segoe UI", sans-serif;
+    background: radial-gradient(120% 80% at 50% 0%, #23104a 0%, #0b0b1e 55%, #05050c 100%); }
+  .selo { position: absolute; left: 80px; top: 80px; padding: 10px 22px; border: 3px solid #ff4d82; border-radius: 10px;
+    font-weight: 700; font-size: 30px; letter-spacing: .12em; color: #ff4d82; box-shadow: 0 0 24px rgba(255, 77, 130, .5); }
+  .bolha { position: absolute; border-radius: 50%; }
+  .b1 { left: 140px; top: 250px; width: 300px; height: 300px; background: #3df5ff;
+    filter: drop-shadow(0 0 40px rgba(61, 245, 255, .7)); }
+  .b2 { right: 150px; top: 330px; width: 220px; height: 220px; background: #d501e8;
+    filter: drop-shadow(0 0 50px rgba(213, 1, 232, .7)); }
+  .titulo { position: absolute; left: 80px; right: 80px; top: 640px; margin: 0; text-align: center;
+    font-size: 132px; line-height: 1; font-weight: 800; text-shadow: 0 0 30px rgba(61, 245, 255, .6); }
+  .titulo em { font-style: normal; color: #ffd73d; }
+  .apoio { position: absolute; left: 120px; right: 120px; top: 830px; margin: 0; text-align: center;
+    font-size: 44px; line-height: 1.3; color: #c9c9e0; }
+  .painel { position: absolute; left: 140px; right: 140px; top: 1010px; padding: 34px 40px; border-radius: 28px;
+    background: rgba(16, 166, 255, .14); border: 2px solid rgba(61, 245, 255, .5); font-size: 36px; text-align: center; }
+  .pilula { position: absolute; left: 50%; top: 1210px; translate: -50% 0; padding: 14px 38px; border-radius: 999px;
+    background: #0b0b1e; border: 3px solid #3df5ff; color: #3df5ff; font-weight: 700; font-size: 40px;
+    box-shadow: 0 0 0 1px rgba(61, 245, 255, .7), 0 0 30px rgba(61, 245, 255, .45); }
+</style>
+</head>
+<body>
+<div id="post">
+  <span class="selo" data-nome="Selo">EXEMPLO</span>
+  <div class="bolha b1" data-nome="Bolha ciano"></div>
+  <div class="bolha b2" data-nome="Bolha magenta"></div>
+  <h1 class="titulo">Arte de <em>exemplo</em></h1>
+  <p class="apoio">Ligue o ✎ Editar e clique em qualquer coisa.</p>
+  <div class="painel">Arraste, mude o texto, o brilho, a forma…</div>
+  <span class="pilula">AFE</span>
+</div>
+<script>window.CONFIG = { largura: 1080, altura: 1350, paginas: 1 };</script>
+<script src="exemplo.edicoes.js"></script>
+<script src="edicoes-lib.js" data-auto></script>
+</body>
+</html>

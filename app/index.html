@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AFE</title>
+<!-- AFE: so a estrutura da tela. Aparencia em editor.css; comportamento em js/ (comece por js/main.js).
+     Abre com:  /editor/?arquivo=<caminho da arte>&pagina=N   (servidor.py precisa estar rodando). -->
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="editor.css">
+</head>
+<body>
+<div class="barra" id="topo">
+  <button id="btnEsq" class="so-editando" title="Mostrar/esconder o painel da esquerda (Camadas e Assets)">◧</button>
+  <button id="ant" title="Página anterior (←)">◀</button>
+  <span id="pag">–</span>
+  <button id="prox" title="Próxima página (→)">▶</button>
+  <input id="arq" type="text" list="listaArtes" spellcheck="false" placeholder="escolha ou digite a arte…"
+    title="Arte aberta (caminho dentro da pasta das artes). Clique para escolher outra.">
+  <datalist id="listaArtes"></datalist>
+  <button id="btnEditar" title="Liga/desliga a edição manual">✎ Editar</button>
+  <button id="btnAnimar" title="Linha do tempo: keyframes e animações">🎬 Animar</button>
+  <span class="sep so-editando"></span>
+  <button id="btnDesf" class="so-editando" title="Desfazer (Ctrl+Z)">↶</button>
+  <button id="btnRefazer" class="so-editando" title="Refazer (Ctrl+Shift+Z ou Ctrl+Y)">↷</button>
+  <button id="btnSalvar" class="salvar so-editando" title="Salvar (Ctrl+S)">💾 Salvar</button>
+  <span id="status">carregando…</span>
+  <button id="btnConfig" title="Configurações: atalhos de teclado e teclas do mouse">⚙</button>
+  <button id="btnDir" class="so-editando" title="Mostrar/esconder o painel da direita (propriedades)">◨</button>
+</div>
+
+<div class="barra" id="rapida">
+  <span class="rot">Alinhar na arte</span>
+  <button data-al="esq" title="Encostar na esquerda da arte"></button>
+  <button data-al="ch" title="Centralizar na horizontal"></button>
+  <button data-al="dir" title="Encostar na direita da arte"></button>
+  <button data-al="topo" title="Encostar no topo da arte"></button>
+  <button data-al="cv" title="Centralizar na vertical"></button>
+  <button data-al="base" title="Encostar na base da arte"></button>
+  <span class="sep"></span>
+  <label>Opacidade <input id="rpO" type="range" data-padrao="100" min="0" max="100" step="1"> <input id="rpOn" type="number" min="0" max="100" step="5"></label>
+  <span class="sep"></span>
+  <button id="rpFrente" title="Traz para a frente">⤒ Frente</button>
+  <button id="rpTras" title="Manda para trás">⤓ Trás</button>
+  <span class="sep"></span>
+  <button id="rpOlho" title="Esconder / mostrar">👁 Esconder</button>
+  <button id="rpTrava" title="Travar: o clique na arte passa por esta camada (Ctrl+clique seleciona mesmo assim)">🔒 Travar</button>
+  <button id="rpOrig" title="Tira todas as edições e volta ao original">↺ Original</button>
+</div>
+
+<div id="area">
+  <aside id="esq" class="lateral">
+    <div class="abas" data-lado="esq">
+      <button data-aba="camadas" class="ativo">Camadas</button>
+      <button data-aba="assets">Assets</button>
+    </div>
+    <div class="painel ativo" id="pn-camadas"></div>
+    <div class="painel" id="pn-assets">
+      <input id="buscaAsset" type="text" placeholder="Buscar asset…">
+      <p class="dica">Arraste para a arte (ou clique para pôr no centro). ★ = biblioteca de assets da marca.
+        Passe o mouse numa imagem e clique em <b>fundo</b> para usá-la como fundo da arte. Em <b>Peças</b>, clique
+        numa peça para escolher o pedaço e pôr na arte.</p>
+      <div id="listaPecas"></div>
+      <div id="listaAssets"><div class="vazio">carregando…</div></div>
+    </div>
+  </aside>
+
+  <main>
+    <div id="moldura">
+      <iframe id="quadro" title="arte"></iframe>
+      <div id="caixasExtra"></div>
+      <div class="caixa" id="caixaHover"></div>
+      <div class="caixa" id="caixaSel"><i class="alca canto" data-h="-1,-1"></i><i class="alca lado-y" data-h="0,-1"></i><i class="alca canto" data-h="1,-1"></i><i class="alca lado-x" data-h="1,0"></i><i class="alca canto" data-h="1,1"></i><i class="alca lado-y" data-h="0,1"></i><i class="alca canto" data-h="-1,1"></i><i class="alca lado-x" data-h="-1,0"></i><i class="alca giro" data-h="giro" title="Girar (Shift: de 15 em 15 graus)"></i></div>
+      <div class="guia" id="guiaV"></div>
+      <div class="guia" id="guiaH"></div>
+    </div>
+  </main>
+
+  <aside id="dir" class="lateral">
+    <div class="abas" data-lado="dir">
+      <button data-aba="transformar" class="ativo">Transformar</button>
+      <button data-aba="efeitos">Efeitos</button>
+      <button data-aba="forma">Forma</button>
+      <button data-aba="animacao">Animação</button>
+    </div>
+    <div class="painel ativo" id="pn-transformar">
+      <div id="selNome">nada selecionado</div>
+      <div class="botoes">
+        <button id="btnPai" title="Seleciona o bloco que contém este elemento">⬆ Bloco de fora</button>
+        <button id="btnTexto" title="Editar o texto (ou duplo clique)">✎ Texto</button>
+        <button id="btnOrig" title="Tira todas as edições e volta ao original">↺ Original</button>
+      </div>
+      <h4>Posição e tamanho</h4>
+      <div class="grade2">
+        <label>X <span class="lado"><input id="inX" type="number" step="1"><span class="kfs" data-kf="x"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
+        <label>Y <span class="lado"><input id="inY" type="number" step="1"><span class="kfs" data-kf="y"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
+        <label>Tamanho % <span class="lado"><input id="inS" type="number" step="1" min="5"><span class="kfs" data-kf="s"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
+        <label title="Estica só a largura (100 = normal)">Largura % <span class="lado"><input id="inSX" type="number" step="1" min="5"><span class="kfs" data-kf="sx"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
+        <label title="Estica só a altura (100 = normal)">Altura % <span class="lado"><input id="inSY" type="number" step="1" min="5"><span class="kfs" data-kf="sy"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
+        <label>Girar ° <span class="lado"><input id="inR" type="number" step="1"><span class="kfs" data-kf="r"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
+        <label>Opacidade % <span class="lado"><input id="inO" type="number" step="5" min="0" max="100"><span class="kfs" data-kf="o"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
+        <label style="justify-content:flex-start"><input id="inOculto" type="checkbox"> Esconder</label>
+      </div>
+      <h4>Alinhar</h4>
+      <div class="botoes">
+        <button id="btnCH" title="Centralizar na horizontal">⇔ Centro</button>
+        <button id="btnCV" title="Centralizar na vertical">⇕ Centro</button>
+        <select id="alvoAlinhar" title="Centralizar em relação a quê">
+          <option value="arte">na arte</option>
+          <option value="bloco">no bloco de fora</option>
+        </select>
+      </div>
+      <h4>Atalhos</h4>
+      <p class="dica">Clique seleciona · <b>Shift+clique</b> soma à seleção · arraste move (gruda no centro) — enquanto arrasta:
+        <b>Shift</b> trava no eixo, <b>Alt</b> anda devagar, <b>Ctrl</b> solta o ímã · alças da caixa: cantos = tamanho
+        (Shift = livre), lados = largura/altura, bolinha = girar (Shift = de 15 em 15°), Alt = a partir do centro · <b>botão direito</b> = menu da
+        camada · <b>Alt + roda</b> alterna entre os elementos embaixo do mouse · camada travada: Ctrl+clique seleciona · nos campos de número, clique e
+        arraste para os lados para mudar o valor (Shift rápido, Alt fino)
+        · setas movem 1 px (Shift: 10) · roda do mouse muda o tamanho · duplo clique edita o texto (Esc termina)
+        · Delete apaga um item acrescentado · Esc solta a seleção · Ctrl+Z desfaz · Ctrl+Shift+Z refaz · Ctrl+S salva.
+        Com vários selecionados, mover, tamanho, giro, opacidade e alinhar valem para todos. <b>⚙</b> (no topo) mostra e troca todos os atalhos.</p>
+    </div>
+    <div class="painel" id="pn-efeitos"></div>
+    <div class="painel" id="pn-forma"></div>
+    <div class="painel" id="pn-animacao">
+      <h4>Entrada</h4>
+      <p class="dica">Como o elemento chega: o efeito roda no começo da camada (padrão: 30 frames = 1 s) e depois some.</p>
+      <select id="selEntrada" title="Efeito de entrada"></select>
+      <div id="cartaoEntrada" style="margin-top:8px"></div>
+      <h4>Tempo da camada</h4>
+      <p class="dica">Em que frame o elemento aparece e some. Na folha de keyframes, é a barra atrás dos losangos:
+        arraste o meio para mover, as pontas para cortar.</p>
+      <div class="grade1">
+        <label title="Move a camada inteira no tempo: a entrada e as chaves vão junto (é o 'delay'). Antes deste frame ela não aparece.">Começa no frame
+          <input id="inIni" type="number" min="0" step="1"></label>
+        <label title="A partir deste frame a camada some (as chaves não mudam). Vazio = fica até o final.">Some no frame
+          <input id="inFim" type="number" min="1" step="1" placeholder="final"></label>
+      </div>
+      <h4>Escalonar</h4>
+      <p class="dica">Com vários selecionados (Shift+clique): cada um começa alguns frames depois do anterior.
+        O primeiro fica onde está. 0 = todos juntos de novo.</p>
+      <div class="botoes">
+        <label>a cada <input id="inEsc" type="number" min="0" step="1" value="5"> frames</label>
+        <select id="selEscOrdem" title="Quem entra primeiro">
+          <option value="leitura">na ordem de leitura</option>
+          <option value="clique">na ordem em que selecionei</option>
+        </select>
+        <button id="btnEscalonar" title="Move cada camada (com a entrada e as chaves) para começar depois da anterior">⏱ Escalonar</button>
+      </div>
+      <h4>Efeito contínuo</h4>
+      <p class="dica">Repete em loop durante toda a animação (fecha o loop sem emenda).</p>
+      <select id="selPreset" title="Animação contínua"></select>
+      <div id="presets" style="margin-top:8px"></div>
+      <p class="dica" style="margin-top:12px">Keyframes ficam na linha do tempo embaixo (🎬 Animar): ◆ grava, <b>Curva</b>
+        escolhe o easing, Ctrl+C / Ctrl+V copiam e colam chaves. Botão direito num losango mostra tudo.</p>
+    </div>
+  </aside>
+</div>
+
+<div id="folha"></div>
+<div class="barra" id="linhaTempo">
+  <button id="btnFrAnt" title="Frame anterior ( , )">◂</button>
+  <button id="btnPlay" title="Tocar / pausar (espaço)">▶</button>
+  <button id="btnFrProx" title="Próximo frame ( . )">▸</button>
+  <span id="tempoTxt">frame 0</span>
+  <label>Duração <input id="inDur" type="number" min="1" max="60" step="0.5" value="5"> s</label>
+  <span class="sep"></span>
+  <button id="btnKfAnt" title="Keyframe anterior">‹</button>
+  <button id="btnKf" title="Grava posição, tamanho, giro, opacidade e brilho neste frame">◆ Chave</button>
+  <button id="btnKfProx" title="Próximo keyframe">›</button>
+  <button id="btnKfDel" title="Apaga o keyframe deste frame">✕ Chave</button>
+  <button id="btnCurva" title="Curva (easing): como o valor anda desta chave até a próxima. Vale para as chaves marcadas na folha (ou a do frame atual). Também no botão direito do losango.">Curva
+    <span id="curvaGraf"></span><span id="curvaNome">Suave</span> ▾</button>
+  <button id="btnKfCopiar" title="Copiar as chaves marcadas na folha, ou a do frame atual (Ctrl+C)">⧉ Copiar</button>
+  <button id="btnKfColar" title="Colar as chaves onde a cabeça está, nos elementos selecionados (Ctrl+V)">⎘ Colar</button>
+  <span class="sep"></span>
+  <button id="btnCapa" title="Usa o frame atual como CAPA: é o que aparece no PNG e fora do modo Animar. Padrão: o último frame, quando tudo já entrou. (▼ na régua)">🖼 Capa</button>
+  <label title="Motion blur no VÍDEO desta página: rastro de movimento, como numa câmera. A prévia aqui e o PNG ficam sem. Com blur o vídeo demora mais para gerar (4× leve, 8× normal, 12× forte).">Blur
+    <select id="selMb"><option value="0">sem</option><option value="0.25">leve</option><option value="0.5">normal</option><option value="1">forte</option></select></label>
+  <button id="btnVideo" title="Gera o MP4 desta página (salva antes)">🎞 Gerar vídeo</button>
+  <span id="videoStatus"></span>
+  <button id="btnMini" title="Minimizar a linha do tempo">▾</button>
+</div>
+
+<div id="pecas" class="janela" hidden>
+  <div class="cx">
+    <h3><span>Peça: <span id="pecaNome"></span></span> <button id="pecaFechar" title="Fechar (Esc)">✕</button></h3>
+    <div class="peca-colunas">
+      <div>
+        <div id="pecaTrilha" class="trilha"></div>
+        <div id="pecaPalco"><iframe id="pecaQuadro" title="prévia da peça"></iframe></div>
+      </div>
+      <div>
+        <h4>Como usar</h4>
+        <div id="pecaLeia"></div>
+        <div class="botoes" style="margin-top:14px">
+          <button id="pecaPor" class="ativo" title="Põe o pedaço escolhido no centro da arte (ou duplo clique nele)">＋ Pôr na arte</button>
+          <button id="pecaCopiar" title="Copia o HTML do pedaço escolhido">⧉ Copiar o código</button>
+        </div>
+        <p class="dica">Na arte, a peça entra como um item ★: dá para mover, mudar de tamanho, animar e trocar os
+          textos com duplo clique. O CSS da marca é copiado para a pasta da arte.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="config" class="janela" hidden>
+  <div class="cx">
+    <h3>⚙ Configurações <button id="cfgFechar" title="Fechar (Esc)">✕</button></h3>
+    <p class="dica">Ficam guardadas neste navegador, neste computador. Não mudam as artes.</p>
+    <div class="cfg-colunas">
+      <div>
+        <h4>Atalhos de teclado</h4>
+        <p class="dica">Clique na tecla e aperte a nova (Esc desiste). ✕ deixa sem atalho · ↺ volta ao padrão.
+          Setas (mover) e Esc (soltar a seleção) são fixas.</p>
+        <div id="cfgTeclas"></div>
+      </div>
+      <div>
+        <h4>Teclas ao usar o mouse</h4>
+        <p class="dica">O que cada tecla faz enquanto você arrasta ou clica. Dentro de um bloco, escolher uma tecla
+          já usada troca as duas de lugar.</p>
+        <div id="cfgMods"></div>
+      </div>
+    </div>
+    <div class="botoes cfg-rodape"><span id="cfgRecado"></span><button id="cfgPadrao">↺ Voltar tudo ao padrão</button></div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

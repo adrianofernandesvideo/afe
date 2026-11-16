@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>AFE — carrossel de demonstração</title>
+<!-- Arte de demonstração: carrossel de 7 páginas sobre o AFE, feito só com HTML/CSS/SVG (sem fontes nem imagens de fora).
+     Cada página mostra a função que ela descreve. A página aberta vem do endereço (?pagina=N): o script abaixo copia
+     a parte comum e o modelo daquela página para dentro de #post. A animação fica em afe-carrossel.edicoes.js. -->
+<style>
+  :root { --fundo-profundo: #04041d; --fundo: #140b49; --vidro: rgba(22, 11, 113, .55); --borda-vidro: rgba(61, 245, 255, .25);
+    --ciano: #3df5ff; --rosa: #ff4d82; --magenta: #d501e8; --azul: #10a6ff; --amarelo: #ffd73d;
+    --texto: #ffffff; --texto-fraco: #b9aee8; --texto-tenue: #7a6fb0; }
+  html, body { margin: 0; background: var(--fundo-profundo); }
+  #post { position: relative; width: 1080px; height: 1350px; overflow: hidden; color: var(--texto);
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background:
+      radial-gradient(55% 40% at 50% 45%, rgba(215, 40, 143, .26), transparent 70%),
+      radial-gradient(60% 45% at 85% 95%, rgba(91, 58, 214, .35), transparent 70%),
+      linear-gradient(180deg, var(--fundo-profundo) 0%, var(--fundo) 100%); }
+
+  /* ── comum a todas as páginas ── */
+  .grade { position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(120, 150, 255, .05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(120, 150, 255, .05) 1px, transparent 1px);
+    background-size: 48px 48px; }
+  .losango { position: absolute; width: 300px; height: 300px; border-radius: 50px; rotate: 45deg; }
+  .losango-azul { left: -170px; top: -170px; background: linear-gradient(135deg, var(--azul), #1b2bd6);
+    box-shadow: 0 0 90px 24px rgba(16, 166, 255, .35); }
+  .losango-rosa { right: -170px; top: 1160px; background: linear-gradient(135deg, #e02a5e, #8a1068);
+    box-shadow: 0 0 90px 24px rgba(194, 24, 91, .4); }
+  .contador { position: absolute; left: 80px; top: 86px; font-family: Consolas, ui-monospace, monospace;
+    font-size: 26px; letter-spacing: .1em; color: var(--texto-tenue); }
+  .marca { position: absolute; right: 80px; top: 72px; font-family: "Segoe UI Black", "Arial Black", system-ui, sans-serif;
+    font-size: 44px; font-weight: 900; text-shadow: -3px 0 0 var(--magenta), 3px 0 0 var(--ciano); }
+  .titulo { position: absolute; left: 80px; top: 180px; width: 920px; margin: 0; font-size: 84px; line-height: 1.02;
+    font-weight: 800; letter-spacing: -.01em; }
+  .titulo em { font-style: normal; color: var(--ciano); }
+  .divisor { position: absolute; left: 80px; width: 220px; height: 10px; border-radius: 5px;
+    background: linear-gradient(90deg, var(--rosa), var(--azul)); }
+  .apoio { position: absolute; left: 80px; width: 900px; margin: 0; font-size: 38px; line-height: 1.32; color: var(--texto-fraco); }
+  .apoio b { color: var(--texto); font-weight: 700; }
+  .arraste { position: absolute; right: 80px; top: 1250px; font-size: 26px; font-weight: 700; letter-spacing: .22em;
+    color: var(--texto-fraco); }
+  .arraste b { color: var(--rosa); font-size: 36px; letter-spacing: -.12em; margin-left: 10px; }
+  .vidro { position: absolute; border-radius: 16px; background: var(--vidro); border: 1px solid var(--borda-vidro);
+    box-shadow: inset 0 0 120px -20px rgba(0, 0, 0, .7), 0 30px 80px -20px rgba(0, 0, 0, .8); }
+  .caixa-sel { position: absolute; border: 3px solid var(--ciano); box-shadow: 0 0 14px rgba(61, 245, 255, .5); }
+  .caixa-sel i { position: absolute; width: 14px; height: 14px; background: var(--texto); border: 3px solid var(--ciano); }
+  .caixa-sel .a1 { left: -10px; top: -10px; } .caixa-sel .a2 { right: -10px; top: -10px; }
+  .caixa-sel .a3 { left: -10px; bottom: -10px; } .caixa-sel .a4 { right: -10px; bottom: -10px; }
+  .caixa-sel .giro { left: 50%; top: -46px; translate: -50% 0; border-radius: 50%; }
+  .cursor { position: absolute; width: 64px; height: 64px; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); }
+
+  /* ── 1 capa ── */
+  .capa-logo { position: absolute; left: 70px; top: 230px; margin: 0; font-family: "Segoe UI Black", "Arial Black", system-ui, sans-serif;
+    font-size: 330px; line-height: 1; font-weight: 900; letter-spacing: -.02em;
+    text-shadow: -10px 0 0 var(--magenta), 9px 0 0 var(--ciano), 0 0 60px rgba(61, 245, 255, .45); }
+  .capa-titulo { position: absolute; left: 80px; top: 640px; width: 920px; margin: 0; font-size: 92px; line-height: 1.02; font-weight: 800; }
+  .capa-titulo em { font-style: normal; color: var(--ciano); }
+  .capa-setas { position: absolute; left: 740px; top: 380px; color: var(--rosa); font-size: 96px; font-weight: 900; letter-spacing: -.14em; }
+
+  .passos { position: absolute; left: 80px; top: 1040px; display: flex; gap: 22px; }
+  .passo { padding: 18px 30px; border-radius: 16px; background: var(--vidro); border: 1px solid var(--borda-vidro);
+    font-size: 34px; font-weight: 800; }
+  .passo b { color: var(--rosa); margin-right: 14px; }
+
+  /* ── 2 dor: o código ── */
+  .codigo { left: 80px; top: 610px; width: 920px; height: 520px; padding: 46px 50px; box-sizing: border-box;
+    font-family: Consolas, ui-monospace, monospace; font-size: 31px; line-height: 1.62; color: var(--texto-fraco); }
+  .codigo .k { color: var(--azul); } .codigo .p { color: var(--ciano); } .codigo .c { color: var(--texto-tenue); }
+  .linha-cor { position: absolute; left: 30px; right: 30px; top: 192px; height: 52px; border-radius: 8px;
+    background: rgba(255, 77, 130, .16); border: 2px solid var(--rosa); }
+  .pergunta { position: absolute; right: 70px; top: 200px; padding: 6px 16px; border-radius: 8px; background: var(--rosa);
+    color: var(--fundo-profundo); font-family: "Segoe UI", system-ui, sans-serif; font-size: 26px; font-weight: 800; }
+
+  /* ── 3 virada: o cartão com a caixa de seleção ── */
+  .cartao { left: 180px; top: 620px; width: 720px; height: 470px; }
+  .cartao .bola { position: absolute; left: 70px; top: 80px; width: 190px; height: 190px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--rosa), var(--magenta)); box-shadow: 0 0 60px rgba(215, 40, 143, .6); }
+  .cartao .ola { position: absolute; left: 320px; top: 92px; font-size: 104px; font-weight: 900; }
+  .cartao .linha { position: absolute; left: 320px; height: 20px; border-radius: 10px; background: rgba(185, 174, 232, .3); }
+  .cartao .l1 { top: 250px; width: 300px; } .cartao .l2 { top: 290px; width: 210px; }
+  .cartao .barra { position: absolute; left: 70px; right: 70px; bottom: 70px; height: 22px; border-radius: 11px;
+    background: linear-gradient(90deg, var(--rosa), var(--azul)); }
+  .cartao .caixa-sel { left: 50px; top: 60px; width: 224px; height: 224px; }
+
+  /* ── 4 toque: antes e depois ── */
+  .comparar { position: absolute; left: 80px; top: 640px; width: 920px; display: flex; gap: 40px; }
+  .lado { flex: 1; }
+  .rotulo { font-family: Consolas, ui-monospace, monospace; font-size: 26px; letter-spacing: .14em; color: var(--texto-tenue);
+    margin-bottom: 18px; }
+  .rotulo.ciano { color: var(--ciano); }
+  .peca { position: relative; height: 380px; border-radius: 16px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 20px; }
+  .peca.antes { background: #1d1a3a; border: 1px solid rgba(185, 174, 232, .2); }
+  .peca.antes .tit { font-size: 64px; font-weight: 700; color: #cfc8ee; }
+  .peca.antes .sub { width: 220px; height: 16px; border-radius: 8px; background: rgba(185, 174, 232, .25); }
+  .peca.depois { background: var(--vidro); border: 2px solid var(--ciano);
+    box-shadow: 0 0 0 1px rgba(61, 245, 255, .7), 0 0 24px rgba(61, 245, 255, .45), 0 0 60px 6px rgba(61, 245, 255, .18); }
+  .peca.depois .tit { font-size: 58px; font-weight: 900; text-shadow: -4px 0 0 var(--magenta), 4px 0 0 var(--ciano); }
+  .peca.depois .sub { width: 220px; height: 16px; border-radius: 8px; background: linear-gradient(90deg, var(--rosa), var(--azul)); }
+
+  /* ── 5 animação: blocos escalonados + mini folha ── */
+  .blocos { position: absolute; left: 80px; top: 650px; width: 920px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .bloco { height: 150px; border-radius: 16px; background: var(--vidro); border: 1px solid var(--borda-vidro);
+    display: flex; align-items: center; gap: 24px; padding: 0 30px; font-size: 34px; font-weight: 800; }
+  .bloco i { width: 64px; height: 64px; border-radius: 14px; flex: none; }
+  .bloco:nth-child(1) i { background: var(--ciano); } .bloco:nth-child(2) i { background: var(--rosa); }
+  .bloco:nth-child(3) i { background: var(--azul); } .bloco:nth-child(4) i { background: var(--amarelo); }
+  .folha { left: 80px; top: 1010px; width: 920px; height: 200px; padding: 28px 30px; box-sizing: border-box; }
+  .folha .trilha { position: relative; height: 26px; margin-bottom: 9px; border-radius: 6px; background: rgba(120, 150, 255, .08); }
+  .folha .trilha b { position: absolute; top: 0; bottom: 0; right: 0; border-radius: 6px; background: rgba(16, 166, 255, .45);
+    border-left: 6px solid var(--amarelo); }
+  .folha .t1 b { left: 0; } .folha .t2 b { left: 12%; } .folha .t3 b { left: 24%; } .folha .t4 b { left: 36%; }
+
+  /* ── 6 finalização: a "tela" de vídeo ── */
+  .tela { left: 140px; top: 620px; width: 800px; height: 500px; overflow: hidden; }
+  .tela .faixa { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: rgba(4, 4, 29, .75);
+    display: flex; align-items: center; gap: 18px; padding: 0 26px; font-family: Consolas, ui-monospace, monospace;
+    font-size: 24px; color: var(--texto-fraco); }
+  .tela .progresso { flex: 1; height: 8px; border-radius: 4px; background: rgba(185, 174, 232, .25); position: relative; }
+  .tela .progresso b { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--rosa), var(--azul)); }
+  .tela .disco { position: absolute; left: 330px; top: 140px; width: 150px; height: 150px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--ciano), var(--azul)); box-shadow: 0 0 60px rgba(61, 245, 255, .55); }
+  .selo-mp4 { position: absolute; left: 790px; top: 585px; padding: 10px 20px; border-radius: 8px; background: var(--amarelo);
+    color: var(--fundo-profundo); font-size: 30px; font-weight: 900; letter-spacing: .06em;
+    box-shadow: 0 0 0 1px rgba(255, 215, 61, .7), 0 0 24px rgba(255, 196, 0, .35); }
+
+  /* ── 7 fechamento ── */
+  .arquivos { position: absolute; left: 80px; top: 640px; width: 920px; display: flex; align-items: center; gap: 30px; }
+  .arquivo { flex: 1; height: 190px; border-radius: 16px; background: var(--vidro); border: 1px solid var(--borda-vidro);
+    display: flex; flex-direction: column; justify-content: center; padding: 0 34px; gap: 12px; }
+  .arquivo .nome { font-family: Consolas, ui-monospace, monospace; font-size: 34px; color: var(--texto); }
+  .arquivo .desc { font-size: 26px; color: var(--texto-fraco); }
+  .arquivo.ed { border-color: var(--ciano); }
+  .arquivo.ed .nome { color: var(--ciano); }
+  .mais { font-size: 70px; font-weight: 900; color: var(--rosa); }
+  .chamada-final { position: absolute; left: 80px; top: 920px; display: flex; align-items: center; gap: 36px; }
+  .pilula { padding: 20px 40px; border-radius: 16px; background: var(--fundo-profundo); border: 2px solid var(--ciano);
+    color: var(--ciano); font-size: 40px; font-weight: 800;
+    box-shadow: 0 0 0 1px rgba(61, 245, 255, .7), 0 0 14px rgba(61, 245, 255, .3), 0 0 40px 4px rgba(61, 245, 255, .1); }
+  .licenca { font-size: 28px; color: var(--texto-fraco); line-height: 1.35; }
+</style>
+</head>
+<body>
+<div id="post"></div>
+
+<template id="comum">
+  <div class="grade" data-nome="Grade"></div>
+  <div class="losango losango-azul" data-nome="Losango azul"></div>
+  <div class="losango losango-rosa" data-nome="Losango rosa"></div>
+  <span class="contador" data-nome="Contador"></span>
+  <span class="marca" data-nome="Marca">AFE</span>
+</template>
+
+<template data-pagina="1">
+  <h1 class="capa-logo" data-nome="Logo">AFE</h1>
+  <span class="capa-setas" data-nome="Setas">›››</span>
+  <h2 class="capa-titulo" data-nome="Título">Seu carrossel de IA,<br><em>do seu jeito.</em></h2>
+  <div class="divisor" data-nome="Divisor" style="top: 870px"></div>
+  <p class="apoio" data-nome="Apoio" style="top: 910px">Edite, anime e finalize — sem tocar em código.</p>
+  <div class="passos" data-nome="Passos">
+    <span class="passo" data-nome="Passo editar"><b>◆</b>Editar</span>
+    <span class="passo" data-nome="Passo animar"><b>∿</b>Animar</span>
+    <span class="passo" data-nome="Passo exportar"><b>▶</b>Exportar</span>
+  </div>
+  <span class="arraste" data-nome="Arraste">ARRASTE<b>›››</b></span>
+</template>
+
+<template data-pagina="2">
+  <h2 class="titulo" data-nome="Título">A IA te entrega a arte.<br>Mas não <em>o controle.</em></h2>
+  <div class="divisor" data-nome="Divisor" style="top: 380px"></div>
+  <p class="apoio" data-nome="Apoio" style="top: 420px">Ela vem em HTML e CSS. Para trocar uma cor, você teria que mexer no código.</p>
+  <div class="vidro codigo" data-nome="Código">
+    <div class="linha-cor" data-nome="Linha da cor"></div>
+    <span class="pergunta" data-nome="Pergunta">e agora?</span>
+    <span class="c">/* título do post */</span><br>
+    <span class="k">.titulo</span> {<br>
+    &nbsp;&nbsp;<span class="p">font-size</span>: 132px;<br>
+    &nbsp;&nbsp;<span class="p">color</span>: #ff4d82;<br>
+    &nbsp;&nbsp;<span class="p">text-shadow</span>: 0 0 30px rgba(…);<br>
+    &nbsp;&nbsp;<span class="p">translate</span>: -50% 0;<br>
+    }
+  </div>
+  <span class="arraste" data-nome="Arraste">ARRASTE<b>›››</b></span>
+</template>
+
+<template data-pagina="3">
+  <h2 class="titulo" data-nome="Título">Abra no AFE e edite<br>com o <em>mouse.</em></h2>
+  <div class="divisor" data-nome="Divisor" style="top: 380px"></div>
+  <p class="apoio" data-nome="Apoio" style="top: 420px">Clique, arraste, mude tamanho, cor, glow e texto — como num editor de design.</p>
+  <div class="vidro cartao" data-nome="Cartão">
+    <div class="bola" data-nome="Bola"></div>
+    <div class="ola" data-nome="Olá">Olá</div>
+    <div class="linha l1" data-nome="Linha 1"></div><div class="linha l2" data-nome="Linha 2"></div>
+    <div class="barra" data-nome="Barra"></div>
+    <div class="caixa-sel" data-nome="Caixa de seleção"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="a4"></i><i class="giro"></i></div>
+  </div>
+  <svg class="cursor" data-nome="Cursor" style="left: 420px; top: 880px" viewBox="0 0 32 32"><path d="M5 3 L5 26 L11 20 L15 29 L19 27 L15 18 L23 18 Z" fill="#ffffff" stroke="#04041d" stroke-width="2" stroke-linejoin="round"/></svg>
+  <span class="arraste" data-nome="Arraste">ARRASTE<b>›››</b></span>
+</template>
+
+<template data-pagina="4">
+  <h2 class="titulo" data-nome="Título">O toque final<br><em>é seu.</em></h2>
+  <div class="divisor" data-nome="Divisor" style="top: 380px"></div>
+  <p class="apoio" data-nome="Apoio" style="top: 420px">Ajuste fino, sombras, cores, a palavra certa: o que tira a <b>cara de IA</b> é a sua decisão.</p>
+  <div class="comparar" data-nome="Comparação">
+    <div class="lado" data-nome="Lado antes">
+      <div class="rotulo" data-nome="Rótulo antes">SÓ O PROMPT</div>
+      <div class="peca antes" data-nome="Peça antes"><div class="tit">Promoção</div><div class="sub"></div></div>
+    </div>
+    <div class="lado" data-nome="Lado depois">
+      <div class="rotulo ciano" data-nome="Rótulo depois">COM O SEU TOQUE</div>
+      <div class="peca depois" data-nome="Peça depois"><div class="tit">PROMOÇÃO</div><div class="sub"></div></div>
+    </div>
+  </div>
+  <span class="arraste" data-nome="Arraste">ARRASTE<b>›››</b></span>
+</template>
+
+<template data-pagina="5">
+  <h2 class="titulo" data-nome="Título">Carrossel animado<br><em>em minutos.</em></h2>
+  <div class="divisor" data-nome="Divisor" style="top: 380px"></div>
+  <p class="apoio" data-nome="Apoio" style="top: 420px">Escolha uma entrada, clique em <b>⏱ Escalonar</b> e os blocos entram um depois do outro. Copie a animação para as outras páginas.</p>
+  <div class="blocos" data-nome="Blocos">
+    <div class="bloco" data-nome="Bloco 1"><i></i>Entrada</div>
+    <div class="bloco" data-nome="Bloco 2"><i></i>Escalonar</div>
+    <div class="bloco" data-nome="Bloco 3"><i></i>Copiar</div>
+    <div class="bloco" data-nome="Bloco 4"><i></i>Colar</div>
+  </div>
+  <div class="vidro folha" data-nome="Folha">
+    <div class="trilha t1" data-nome="Trilha 1"><b></b></div>
+    <div class="trilha t2" data-nome="Trilha 2"><b></b></div>
+    <div class="trilha t3" data-nome="Trilha 3"><b></b></div>
+    <div class="trilha t4" data-nome="Trilha 4"><b></b></div>
+  </div>
+  <span class="arraste" data-nome="Arraste">ARRASTE<b>›››</b></span>
+</template>
+
+<template data-pagina="6">
+  <h2 class="titulo" data-nome="Título">Cada página<br><em>vira vídeo.</em></h2>
+  <div class="divisor" data-nome="Divisor" style="top: 380px"></div>
+  <p class="apoio" data-nome="Apoio" style="top: 420px">MP4 no tamanho da arte, com motion blur, pronto para postar.</p>
+  <div class="vidro tela" data-nome="Tela">
+    <div class="disco" data-nome="Disco"></div>
+    <div class="faixa" data-nome="Faixa">▶ <div class="progresso"><b></b></div> 00:03 / 00:05</div>
+  </div>
+  <span class="selo-mp4" data-nome="Selo MP4">MP4</span>
+  <span class="arraste" data-nome="Arraste">ARRASTE<b>›››</b></span>
+</template>
+
+<template data-pagina="7">
+  <h2 class="titulo" data-nome="Título">Livre, aberto<br>e com o seu<br><em>código intacto.</em></h2>
+  <div class="divisor" data-nome="Divisor" style="top: 470px"></div>
+  <p class="apoio" data-nome="Apoio" style="top: 510px">Suas mudanças ficam num arquivo ao lado da arte: apague e ela volta ao original.</p>
+  <div class="arquivos" data-nome="Arquivos" style="top: 730px">
+    <div class="arquivo" data-nome="Arquivo da arte"><span class="nome">arte.html</span><span class="desc">o código, intocado</span></div>
+    <span class="mais" data-nome="Mais">+</span>
+    <div class="arquivo ed" data-nome="Arquivo de edições"><span class="nome">arte.edicoes.js</span><span class="desc">as suas mudanças</span></div>
+  </div>
+  <div class="chamada-final" data-nome="Chamada final" style="top: 1010px">
+    <span class="pilula" data-nome="Pílula">Baixe grátis no GitHub</span>
+    <span class="licenca" data-nome="Licença">Software livre<br>AGPL-3.0</span>
+  </div>
+</template>
+
+<script>
+  // monta a página pedida no endereço (?pagina=N) antes de a biblioteca do editor aplicar as edições
+  window.CONFIG = { largura: 1080, altura: 1350, paginas: 7 };
+  (function () {
+    const n = Math.min(7, Math.max(1, +new URLSearchParams(location.search).get('pagina') || 1));
+    const post = document.getElementById('post');
+    post.append(document.getElementById('comum').content.cloneNode(true));
+    post.append(document.querySelector('template[data-pagina="' + n + '"]').content.cloneNode(true));
+    post.querySelector('.contador').textContent = String(n).padStart(2, '0') + ' / 07';
+  })();
+</script>
+<script src="afe-carrossel.edicoes.js"></script>
+<script src="edicoes-lib.js" data-auto></script>
+</body>
+</html>
