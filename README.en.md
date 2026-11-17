@@ -56,6 +56,8 @@ The editor never installs anything by itself: if something is missing, it tells 
 
 - **Download:** on the [Releases](https://github.com/adrianofernandesvideo/afe/releases) page, get the `.zip` for your system (Windows, macOS or Linux), unzip it
   and double-click **AFE**. No Python needed. To use it with your own artwork, drag its `.html` onto AFE.
+- **Using an AI (Claude, ChatGPT, Cursor…)?** Ask it to read the `AGENTS.md` that comes in the `.zip`: it explains
+  how AFE works, how to create artwork that works well in the editor and what not to touch so your edits aren't lost.
 - **Want to see it before installing?** The **[live preview](https://adrianofernandesvideo.github.io/afe/)** is the real editor, in the browser, with the
   demo artwork. Your edits stay in your browser only (you can download them). Video rendering and asset libraries
   only work in the downloaded AFE.

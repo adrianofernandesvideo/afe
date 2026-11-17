@@ -22,9 +22,15 @@ USAR COM AS SUAS ARTES
   - Ou coloque a arte dentro da pasta "artes" e rode, num terminal:  AFE ligar artes/minha-arte.html
   - A arte precisa ter tamanho fixo (ex.: 1080x1350). Detalhes no README do projeto.
 
+USA UMA IA (Claude, ChatGPT, Cursor...)?
+  Peça para ela ler o arquivo AGENTS.md desta pasta antes de criar ou mexer nas suas artes.
+  Ele explica para a IA como o AFE funciona, como fazer artes que dão certo no editor e o que
+  não mexer para não perder as suas edições.
+
 GERAR VÍDEO
   O botão de vídeo precisa, além do AFE, do Python 3 com Playwright e do ffmpeg
   instalados no computador. Sem eles, todo o resto funciona.
+  Como instalar: seção 6 do AGENTS.md.
 
 Código, documentação e novidades: https://github.com/adrianofernandesvideo/afe
 Licença: AGPL-3.0 (arquivo LICENSE). Copyright (C) 2026 Adriano Fernandes.
@@ -43,6 +49,9 @@ HOW TO OPEN
 YOUR OWN ARTWORK
   Drag your art's .html file onto AFE: it connects the art to the editor and opens it.
   (The editor's interface is in Portuguese for now; the docs on GitHub are in English too.)
+
+USING AN AI (Claude, ChatGPT, Cursor...)?
+  Ask it to read AGENTS.md in this folder before creating or changing your artwork.
 
 VIDEO
   Rendering video also needs Python 3 with Playwright and ffmpeg installed.

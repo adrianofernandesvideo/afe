@@ -4,6 +4,17 @@
 
 Newest on top. When you change something, add a line here (in both languages).
 
+## 2.4.1 beta — 2026-11-17 · a guide for your AI and updated demo copy
+
+- **Guide for the user's AI:** the executable's `.zip` now ships `AGENTS.md` (plus a `CLAUDE.md` pointing to it):
+  how AFE works, the folder map, how to create artwork that works well in the editor, what not to touch so edits
+  aren't lost, how to install what video rendering needs, and common problems. `LEIA-PRIMEIRO.txt` tells people to
+  ask their AI to read it. Source: `distribuir/AGENTS.md` (in Portuguese; the AI answers in the user's language).
+- **Demo artwork copy updated:** "Edite manualmente, anime e exporte em vídeo…" (was "Edite ao vivo, no
+  navegador…"), pill "Windows · macOS · Linux" (was "Python + seu navegador") and carousel page 3 "edite
+  manualmente" (was "com o mouse"); SETUP/LEIA wording too. README images redone; the GIF now starts on the full
+  artwork (people with animations turned off see the whole art, not a nearly empty first frame).
+
 ## 2.4 beta — 2026-11-17 · blend modes, grain, images from the computer and a reorganized screen
 
 **New**

@@ -15,6 +15,7 @@ O que sai (em --saida):
       AFE.exe (ou AFE)      o servidor.py + a tela do editor + o ligar.py, num arquivo so (nao precisa de Python)
       artes/                as artes de demonstracao (o executavel abre esta pasta)
       LEIA-PRIMEIRO.txt     como usar
+      AGENTS.md, CLAUDE.md  guia para a IA de quem usa (como o AFE funciona, como criar artes, o que nao mexer)
       LICENSE
 --testar: liga o executavel numa porta livre e confere se ele responde (o editor, a API e uma arte), e
          confere o "AFE ligar" numa arte nova.
@@ -175,8 +176,10 @@ def main():
     pasta.mkdir(parents=True)
     shutil.copy2(exe, pasta / exe.name)
     shutil.copytree(EDITOR / "demos" / "artes", pasta / "artes", ignore=PULAR_COPIA)
-    leia = (AQUI / "LEIA-PRIMEIRO.txt").read_text(encoding="utf-8").replace("{{VERSAO}}", a.versao)
-    (pasta / "LEIA-PRIMEIRO.txt").write_text(leia, encoding="utf-8", newline="\r\n" if sistema == "windows" else "\n")
+    for nome in ("LEIA-PRIMEIRO.txt", "AGENTS.md", "CLAUDE.md"):   # textos com {{VERSAO}}; o .txt no Windows vai com CRLF
+        texto = (AQUI / nome).read_text(encoding="utf-8").replace("{{VERSAO}}", a.versao)
+        crlf = sistema == "windows" and nome.endswith(".txt")
+        (pasta / nome).write_text(texto, encoding="utf-8", newline="\r\n" if crlf else "\n")
     shutil.copy2(EDITOR / "LICENSE", pasta / "LICENSE")
     if a.testar:
         testar(pasta / exe.name, pasta / "artes")

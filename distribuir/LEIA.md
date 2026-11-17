@@ -11,6 +11,7 @@ geram um release só). Ninguém precisa rodar nada no próprio computador para p
 | `../.github/workflows/demo-online.yml` | a cada push: monta e publica a demo online no GitHub Pages |
 | `empacotar.py` | gera o executável (PyInstaller) e o `.zip` do release, e testa o executável |
 | `LEIA-PRIMEIRO.txt` | o "como usar" que vai dentro do `.zip` |
+| `AGENTS.md` · `CLAUDE.md` | o guia para a IA de quem baixa (vão dentro do `.zip`; o `CLAUDE.md` só aponta para o `AGENTS.md`) |
 | `montar_site.py` | monta o site da demo online (só arquivos parados) |
 | `demo/sw.js` | o "servidor" da demo, dentro do navegador de quem testa |
 | `demo/demo.js` | o selo "DEMO ONLINE" (baixar minhas edições · voltar ao original · baixar o AFE) |
@@ -55,7 +56,8 @@ Abra `http://localhost:8790/`. (O executável só dá para gerar com o PyInstall
 
 **English summary.** Every push to `main` triggers two GitHub Actions workflows: `release.yml` picks the next
 free version (`<VERSAO>.<n>-beta`, never overwriting an existing one), builds and tests the executable on
-Windows, macOS and Linux with `empacotar.py` (PyInstaller) and publishes a release with the three `.zip` files;
+Windows, macOS and Linux with `empacotar.py` (PyInstaller) and publishes a release with the three `.zip` files (each with `LEIA-PRIMEIRO.txt` and `AGENTS.md`, a guide for the
+user's AI);
 `demo-online.yml` builds the static online demo with `montar_site.py` and deploys it to GitHub Pages (public
 repositories only; set *Settings → Pages → Source* to *GitHub Actions* once). In the demo, `demo/sw.js` is a
 service worker that plays the server's role inside the browser; edits stay in the visitor's browser. Put

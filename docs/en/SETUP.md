@@ -6,7 +6,7 @@
 > followed by a translation the first time — e.g. **✎ Editar** (Edit).
 
 A visual editor for artwork made in HTML (posts, carousels, stories, banners): you open the art in the browser
-and adjust it **with the mouse**, without touching its code — move, resize and retype, glows and shadows,
+and adjust it **manually**, without touching its code — move, resize and retype, glows and shadows,
 corners and outlines, add images and shapes, animate with keyframes and render the video.
 
 This folder is **complete and self-contained**: it doesn't depend on any project. To use it with another

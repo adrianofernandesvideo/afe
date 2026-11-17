@@ -7,7 +7,7 @@ something here is done (and log it in the [CHANGELOG](CHANGELOG.md)).
 
 ## Current state — version 2.4 beta
 
-**Done and tested** (`python testes/teste_rapido.py --video`: 163 checks passing):
+**Done and tested** (`python testes/teste_rapido.py --video`: 165 checks passing):
 
 - **Open:** any fixed-size `.html` artwork, with pages and automatic refresh on save.
 - **Edit:** select (one or many), move (mouse, arrows, snap to center), size, rotation, opacity, hide, text,
@@ -35,7 +35,7 @@ something here is done (and log it in the [CHANGELOG](CHANGELOG.md)).
 - **Screen:** effects on the left, layers on the right; bottom bar with play in the center; shortcuts as a list.
 - **⚙ Config:** the key for each command and the role of Shift/Alt/Ctrl with the mouse, stored in the browser.
 - Undo/redo (300 steps); saving keeps the previous version.
-- **Distribution:** a release on every push with an executable (Windows, macOS, Linux) and an online demo on GitHub Pages.
+- **Distribution:** a release on every push with an executable (Windows, macOS, Linux) and an online demo on GitHub Pages; the `.zip` ships a guide for the user's AI (`AGENTS.md`).
 - Portable: a single folder, server with `--raiz`, `ligar.py`, sample artwork, automated test.
 
 ## Decisions that guide the project

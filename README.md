@@ -53,6 +53,8 @@ O editor não instala nada sozinho: se faltar algo, ele avisa o quê.
 - **Baixe:** na página de [Releases](https://github.com/adrianofernandesvideo/afe/releases), pegue o `.zip` do seu sistema (Windows, macOS ou Linux),
   descompacte e dê dois cliques em **AFE**. Não precisa de Python. Para usar com uma arte sua, arraste o `.html`
   dela em cima do AFE.
+- **Usa uma IA (Claude, ChatGPT, Cursor…)?** Peça para ela ler o `AGENTS.md` que vem no `.zip`: ele explica como
+  o AFE funciona, como criar artes que dão certo no editor e o que não mexer para não perder as suas edições.
 - **Quer ver antes de instalar?** O **[live preview](https://adrianofernandesvideo.github.io/afe/)** é o editor de verdade, no navegador, com as artes
   de demonstração. As edições ficam só no seu navegador (dá para baixá-las). Gerar vídeo e as bibliotecas de
   assets só funcionam no AFE baixado.

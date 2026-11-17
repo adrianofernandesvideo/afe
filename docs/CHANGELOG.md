@@ -4,6 +4,17 @@
 
 Mais novo em cima. Ao mudar algo, acrescente uma linha aqui (e na versão em inglês).
 
+## 2.4.1 beta — 2026-11-17 · guia para a IA e textos das demonstrações
+
+- **Guia para a IA de quem usa:** o `.zip` do executável agora traz `AGENTS.md` (e um `CLAUDE.md` que aponta
+  para ele): como o AFE funciona, o mapa das pastas, como criar artes que dão certo no editor, o que não mexer
+  para não perder edições, como instalar o que o vídeo precisa e problemas comuns. O `LEIA-PRIMEIRO.txt` manda
+  pedir para a IA ler esse arquivo. Fonte: `distribuir/AGENTS.md`.
+- **Textos das artes de demonstração atualizados:** "Edite manualmente, anime e exporte em vídeo…" (era "Edite ao
+  vivo, no navegador…"), pílula "Windows · macOS · Linux" (era "Python + seu navegador") e página 3 do carrossel
+  "edite manualmente" (era "com o mouse"). LEIA.md também. Imagens do README refeitas; o GIF agora começa na arte
+  completa (quem tem as animações desligadas vê a arte inteira parada, e não o primeiro quadro quase vazio).
+
 ## 2.4 beta — 2026-11-17 · mesclagem, granulado, imagens do computador e tela reorganizada
 
 **Novidades**

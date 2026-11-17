@@ -7,7 +7,7 @@ algo daqui ficar pronto (e registre no [CHANGELOG](CHANGELOG.md)).
 
 ## Estado atual — versão 2.4 beta
 
-**Pronto e testado** (`python testes/teste_rapido.py --video`: 163 conferências passando):
+**Pronto e testado** (`python testes/teste_rapido.py --video`: 165 conferências passando):
 
 - **Abrir:** qualquer arte `.html` de tamanho fixo, com páginas e atualização automática ao salvar.
 - **Editar:** selecionar (um ou vários), mover (mouse, setas, ímã no centro), tamanho, giro, opacidade,
@@ -35,7 +35,7 @@ algo daqui ficar pronto (e registre no [CHANGELOG](CHANGELOG.md)).
 - **Tela:** efeitos à esquerda, camadas à direita; barra de baixo com o play no centro; atalhos em lista.
 - **⚙ Config:** tecla de cada comando e papel de Shift/Alt/Ctrl no mouse, guardados no navegador.
 - Desfazer/refazer (300 passos); salvar guarda a versão anterior.
-- **Distribuição:** release a cada push com executável (Windows, macOS, Linux) e demo online no GitHub Pages.
+- **Distribuição:** release a cada push com executável (Windows, macOS, Linux) e demo online no GitHub Pages; o `.zip` traz um guia para a IA de quem usa (`AGENTS.md`).
 - Portátil: pasta única, servidor com `--raiz`, `ligar.py`, arte de exemplo, teste automático.
 
 ## Decisões que guiam o projeto

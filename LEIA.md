@@ -3,7 +3,7 @@
 **Português (BR)** · [English](docs/en/SETUP.md)
 
 Editor visual para artes feitas em HTML (posts, carrosséis, stories, banners): você abre a arte no
-navegador e ajusta **com o mouse**, sem mexer no código — mover, mudar tamanho e texto, glows e
+navegador e ajusta **manualmente**, sem mexer no código — mover, mudar tamanho e texto, glows e
 sombras, cantos e contornos, acrescentar imagens e formas, animar com keyframes e gerar o vídeo.
 
 Esta pasta é **completa e independente**: não depende de nenhum projeto. Para usar com outro
