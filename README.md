@@ -9,10 +9,12 @@
 >
 > **Beta:** funciona e tem teste automático, mas ainda pode ter arestas. Se algo quebrar, abra uma *issue*.
 
-Acesse o live preview agora mesmo [clicando aqui.](https://adrianofernandesvideo.github.io/afe/)
+### ⬇ [Baixe o AFE grátis](https://github.com/adrianofernandesvideo/afe/releases) — Windows, macOS e Linux
+
+Ou teste agora no navegador, sem instalar nada: **[abrir o live preview](https://adrianofernandesvideo.github.io/afe/)**
 
 Editor visual para artes feitas em HTML — posts, carrosséis, stories, banners. Você abre a arte no
-navegador e ajusta **com o mouse**, sem mexer no código: mover, mudar tamanho e texto, glows e sombras,
+navegador e ajusta **manualmente**, sem mexer no código: mover, mudar tamanho e texto, glows e sombras,
 cantos e contornos, acrescentar imagens e formas, animar com keyframes e gerar o vídeo.
 
 ![O AFE editando a própria propaganda: a arte no meio, a animação à esquerda, as camadas à direita e a folha de keyframes embaixo](docs/imagens/afe-editor.png)
@@ -36,7 +38,8 @@ cantos e contornos, acrescentar imagens e formas, animar com keyframes e gerar o
 
 ## Requisitos
 
-- **Para editar:** Python 3 (o servidor usa só a biblioteca padrão) e um navegador Edge ou Chrome.
+- **Pelo executável (Releases):** só um navegador (Edge ou Chrome). Não precisa de Python.
+- **Pelo código:** Python 3 (o servidor usa só a biblioteca padrão) e um navegador Edge ou Chrome.
 - **Para gerar vídeo e rodar o teste automático:** também o [Playwright para Python](https://playwright.dev/python/)
   e o [ffmpeg](https://ffmpeg.org) no PATH.
 
@@ -45,14 +48,14 @@ O editor não instala nada sozinho: se faltar algo, ele avisa o quê.
 > Desenvolvido e usado no **Windows** com Python 3.14. macOS, Linux e versões mais antigas do Python ainda não
 > foram testados — relatos e correções são bem-vindos.
 
-## Experimentar sem instalar nada
+## Baixar e usar
 
-- **Demo online:** **https://adrianofernandesvideo.github.io/afe/** — o editor de verdade, no navegador, com as
-  artes de demonstração. As edições ficam só no seu navegador (dá para baixá-las). Gerar vídeo e as bibliotecas
-  de assets só funcionam no AFE baixado.
-- **Executável:** na página de [Releases](https://github.com/adrianofernandesvideo/afe/releases), baixe o `.zip`
-  do seu sistema (Windows, macOS ou Linux), descompacte e dê dois cliques em **AFE**. Não precisa de Python. Para
-  usar com uma arte sua, arraste o `.html` dela em cima do AFE.
+- **Baixe:** na página de [Releases](https://github.com/adrianofernandesvideo/afe/releases), pegue o `.zip` do seu sistema (Windows, macOS ou Linux),
+  descompacte e dê dois cliques em **AFE**. Não precisa de Python. Para usar com uma arte sua, arraste o `.html`
+  dela em cima do AFE.
+- **Quer ver antes de instalar?** O **[live preview](https://adrianofernandesvideo.github.io/afe/)** é o editor de verdade, no navegador, com as artes
+  de demonstração. As edições ficam só no seu navegador (dá para baixá-las). Gerar vídeo e as bibliotecas de
+  assets só funcionam no AFE baixado.
 
 Cada push na `main` gera sozinho um release novo (`2.3.0-beta`, `2.3.1-beta`…) e atualiza a demo online — veja
 [distribuir/LEIA.md](distribuir/LEIA.md).
