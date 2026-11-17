@@ -6,6 +6,8 @@ Newest on top. When you change something, add a line here (in both languages).
 
 ## 2.3 beta — 2026-11-16 · automatic releases, executable and online demo
 
+- **Mode in the address:** `?modo=editar` or `?modo=animar` opens the editor with that mode on (with animar,
+  the animation plays once and stops at the end). The online demo opens this way.
 - **A release on every push** (`.github/workflows/release.yml`): each push to `main` creates a new release with
   a number that never repeats (`<servidor.py VERSAO>.<n>-beta`), automatic notes and the **executable** for
   Windows, macOS and Linux (`distribuir/empacotar.py`, with PyInstaller on GitHub's machine). Each executable is

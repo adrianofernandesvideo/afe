@@ -6,6 +6,8 @@ Mais novo em cima. Ao mudar algo, acrescente uma linha aqui (e na versão em ing
 
 ## 2.3 beta — 2026-11-16 · releases automáticos, executável e demo online
 
+- **Endereço com modo:** `?modo=editar` ou `?modo=animar` abre o editor já com o modo ligado (no animar, a
+  animação toca uma vez e para no fim). A demo online abre assim.
 - **Release a cada push** (`.github/workflows/release.yml`): cada push na `main` cria um release novo, com
   número que nunca se repete (`<VERSAO do servidor.py>.<n>-beta`), notas automáticas e o **executável** para
   Windows, macOS e Linux (`distribuir/empacotar.py`, com PyInstaller na máquina do GitHub). Cada executável é

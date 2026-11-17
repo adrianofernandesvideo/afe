@@ -14,7 +14,7 @@
 //   barra-topo · barra-tempo · campos · atalhos     ligações com a tela
 //   config      preferências (teclas dos comandos, teclas do mouse)   ·   painel-config  a tela ⚙
 // Detalhes e "como acrescentar uma função": docs/ARQUITETURA.md.
-import { S, status } from './base.js';
+import { S, status, ouvir } from './base.js';
 import { api } from './api.js';
 import * as arte from './arte.js';
 import * as doc from './doc.js';
@@ -51,6 +51,18 @@ async function iniciar() {
   const q = new URLSearchParams(location.search);
   let arquivo = q.get('arquivo');
   const pagina = Math.max(1, +(q.get('pagina') || 1));
+  // ?modo=editar ou ?modo=animar: abre já com o modo ligado (a demo online usa; vale também para links).
+  // No animar, a animação toca uma vez e para no fim (no frame 0 a arte costuma estar quase vazia).
+  const modo = q.get('modo');
+  if (modo === 'editar' || modo === 'animar') {
+    let feito = false;
+    ouvir('arte', () => {
+      if (feito || !S.lib) return;
+      feito = true;
+      paineis.definirEdicao(true);
+      if (modo === 'animar') { paineis.definirAnimacao(true); setTimeout(() => tempo.tocarTrecho(0, Infinity), 400); }
+    });
+  }
   listarArtes();
   if (!arquivo) {                                           // sem arte no endereço: a última usada, ou a primeira ligada
     try {

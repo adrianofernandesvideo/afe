@@ -32,7 +32,7 @@
     try {
       await navigator.serviceWorker.register('sw.js', { scope: './' });
       await navigator.serviceWorker.ready;
-      location.replace('editor/?arquivo={{ARTE}}');
+      location.replace('editor/?arquivo={{ARTE}}&modo=animar');
     } catch (e) {
       falhar('Não deu para abrir a demo neste navegador (janela anônima ou cookies bloqueados?).');
     }
