@@ -197,8 +197,9 @@ $('pecaFechar').onclick = fecharPeca;
 janela.addEventListener('mousedown', (ev) => { if (ev.target === janela) fecharPeca(); });
 addEventListener('keydown', (ev) => { if (!janela.hidden && ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); fecharPeca(); } }, true);
 
-// cópia do pedaço escolhido (o destaque fica fora dele: não há o que limpar)
-const copiaLimpa = () => aberta.sel.cloneNode(true);
+// Clone selected piece into an inert document so detached elements do not trigger network requests
+const inertDocument = document.createElement('template').content.ownerDocument;
+const copiaLimpa = () => inertDocument.importNode(aberta.sel, true);
 $('pecaCopiar').onclick = async () => {
   if (!aberta || !aberta.sel) return;
   try { await navigator.clipboard.writeText(copiaLimpa().outerHTML); aviso('código da peça copiado'); }
