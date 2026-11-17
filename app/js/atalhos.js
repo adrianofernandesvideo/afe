@@ -16,10 +16,10 @@ import { selecionar, paraMover } from './selecao.js';
 import { iniciarTexto, terminarTexto, podeTexto } from './texto.js';
 import { definirEdicao, definirAnimacao, abrirLado, trocarAba, minimizarTempo } from './paineis.js';
 import { centralizar } from './alinhar.js';
-import { alternarPlay, passoFrame, gravarChave, definirCapa, copiarChaves, colarChaves, temCopia } from './tempo.js';
+import { alternarPlay, definirLoop, passoFrame, gravarChave, definirCapa, copiarChaves, colarChaves, temCopia } from './tempo.js';
 import { chavesMarcadas, chavesAlvo, apagarMarcadas, desmarcarChave } from './folha.js';
 import { removerNovos, novosSelecionados } from './painel-assets.js';
-import { mudarOrdem, alternarOculto, alternarTrava } from './camada-acoes.js';
+import { mudarOrdem, alternarOculto, alternarTrava, apagarCamadas, confirmarOriginal } from './camada-acoes.js';
 import { irPagina } from './navegacao.js';
 import { teclaDe, comboDe } from './config.js';
 
@@ -34,20 +34,20 @@ export const COMANDOS = [
   // ── Modos e painéis ──
   { id: 'editar', grupo: 'Modos e painéis', nome: 'Ligar / desligar o ✎ Editar', padrao: 'e', fazer: () => definirEdicao() },
   { id: 'animar', grupo: 'Modos e painéis', nome: 'Ligar / desligar o 🎬 Animar', padrao: 'a', fazer: () => definirAnimacao() },
-  { id: 'abaTransformar', grupo: 'Modos e painéis', nome: 'Abrir a aba Transformar', padrao: '1', quando: () => S.editando, fazer: aba('dir', 'transformar') },
-  { id: 'abaEfeitos', grupo: 'Modos e painéis', nome: 'Abrir a aba Efeitos', padrao: '2', quando: () => S.editando, fazer: aba('dir', 'efeitos') },
-  { id: 'abaForma', grupo: 'Modos e painéis', nome: 'Abrir a aba Forma', padrao: '3', quando: () => S.editando, fazer: aba('dir', 'forma') },
-  { id: 'abaAnimacao', grupo: 'Modos e painéis', nome: 'Abrir a aba Animação', padrao: '4', quando: () => S.editando, fazer: aba('dir', 'animacao') },
-  { id: 'abaCamadas', grupo: 'Modos e painéis', nome: 'Abrir a aba Camadas', padrao: '5', quando: () => S.editando, fazer: aba('esq', 'camadas') },
-  { id: 'abaAssets', grupo: 'Modos e painéis', nome: 'Abrir a aba Assets', padrao: '6', quando: () => S.editando, fazer: aba('esq', 'assets') },
+  { id: 'abaTransformar', grupo: 'Modos e painéis', nome: 'Abrir a aba Transformar', padrao: '1', quando: () => S.editando, fazer: aba('esq', 'transformar') },
+  { id: 'abaEfeitos', grupo: 'Modos e painéis', nome: 'Abrir a aba Efeitos', padrao: '2', quando: () => S.editando, fazer: aba('esq', 'efeitos') },
+  { id: 'abaForma', grupo: 'Modos e painéis', nome: 'Abrir a aba Forma', padrao: '3', quando: () => S.editando, fazer: aba('esq', 'forma') },
+  { id: 'abaAnimacao', grupo: 'Modos e painéis', nome: 'Abrir a aba Animação', padrao: '4', quando: () => S.editando, fazer: aba('esq', 'animacao') },
+  { id: 'abaCamadas', grupo: 'Modos e painéis', nome: 'Abrir a aba Camadas', padrao: '5', quando: () => S.editando, fazer: aba('dir', 'camadas') },
+  { id: 'abaAssets', grupo: 'Modos e painéis', nome: 'Abrir a aba Assets', padrao: '6', quando: () => S.editando, fazer: aba('dir', 'assets') },
   { id: 'painelEsq', grupo: 'Modos e painéis', nome: 'Mostrar / esconder o painel da esquerda', padrao: '', quando: () => S.editando, fazer: () => abrirLado('esq') },
   { id: 'painelDir', grupo: 'Modos e painéis', nome: 'Mostrar / esconder o painel da direita', padrao: '', quando: () => S.editando, fazer: () => abrirLado('dir') },
   { id: 'miniTempo', grupo: 'Modos e painéis', nome: 'Minimizar / expandir a linha do tempo', padrao: '', quando: () => S.animando, fazer: () => minimizarTempo() },
   { id: 'config', grupo: 'Modos e painéis', nome: 'Abrir estas configurações', padrao: '', fazer: () => document.getElementById('btnConfig').click() },
   // ── Elemento selecionado ──
-  { id: 'apagar', grupo: 'Elemento selecionado', nome: 'Apagar (chave marcada na folha, ou item ★)', padrao: 'delete', outros: ['backspace'],
-    quando: () => chavesMarcadas().length > 0 || (S.editando && novosSelecionados()),
-    fazer: () => { if (chavesMarcadas().length) apagarMarcadas(); else removerNovos(); } },
+  { id: 'apagar', grupo: 'Elemento selecionado', nome: 'Apagar (chave marcada na folha, ou a camada selecionada)', padrao: 'delete', outros: ['backspace'],
+    quando: () => chavesMarcadas().length > 0 || (S.editando && S.selPaths.length > 0),
+    fazer: () => { if (chavesMarcadas().length) apagarMarcadas(); else apagarCamadas(); } },
   { id: 'texto', grupo: 'Elemento selecionado', nome: 'Editar o texto', padrao: 't', quando: () => comSelecao() && podeTexto(S.sel), fazer: () => iniciarTexto(S.sel) },
   { id: 'esconder', grupo: 'Elemento selecionado', nome: 'Esconder / mostrar', padrao: 'h', quando: comSelecao, fazer: () => alternarOculto() },
   { id: 'travar', grupo: 'Elemento selecionado', nome: 'Travar / destravar', padrao: 'l', quando: comSelecao, fazer: () => alternarTrava() },
@@ -55,9 +55,11 @@ export const COMANDOS = [
   { id: 'tras', grupo: 'Elemento selecionado', nome: 'Mandar para trás', padrao: '[', quando: comSelecao, fazer: () => mudarOrdem(-1) },
   { id: 'centroH', grupo: 'Elemento selecionado', nome: 'Centralizar na horizontal', padrao: '', quando: comSelecao, fazer: () => centralizar('h') },
   { id: 'centroV', grupo: 'Elemento selecionado', nome: 'Centralizar na vertical', padrao: '', quando: comSelecao, fazer: () => centralizar('v') },
-  { id: 'original', grupo: 'Elemento selecionado', nome: 'Voltar ao original', padrao: '', quando: comSelecao, fazer: () => removerEdicoes() },
+  { id: 'original', grupo: 'Elemento selecionado', nome: 'Voltar ao original', padrao: '', quando: comSelecao, fazer: () => confirmarOriginal() },
   // ── Animação (com o 🎬 Animar ligado) ──
-  { id: 'tocar', grupo: 'Animação', nome: 'Tocar / pausar', padrao: 'space', quando: () => S.animando, fazer: alternarPlay },
+  { id: 'tocar', grupo: 'Animação', nome: 'Tocar / pausar', padrao: 'space', quando: () => S.animando, fazer: () => alternarPlay() },
+  { id: 'tocarInverso', grupo: 'Animação', nome: 'Tocar o contrário do loop (só desta vez)', padrao: 'shift+space', quando: () => S.animando, fazer: () => alternarPlay(true) },
+  { id: 'loop', grupo: 'Animação', nome: 'Ligar / desligar o loop', padrao: '', quando: () => S.animando, fazer: () => definirLoop() },
   { id: 'frameAnt', grupo: 'Animação', nome: 'Frame anterior', padrao: ',', quando: () => S.animando, fazer: () => passoFrame(-1) },
   { id: 'frameProx', grupo: 'Animação', nome: 'Próximo frame', padrao: '.', quando: () => S.animando, fazer: () => passoFrame(1) },
   { id: 'chave', grupo: 'Animação', nome: 'Gravar ◆ Chave', padrao: 'k', quando: () => S.animando && S.selPaths.length > 0, fazer: gravarChave },

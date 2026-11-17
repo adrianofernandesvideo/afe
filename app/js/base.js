@@ -17,7 +17,7 @@ export const S = {
   sel: null, selCaminho: null, selPaths: [],             // seleção: elemento e caminho do principal + todos os caminhos
   hover: null, editTexto: null,                          // elemento sob o mouse / com texto em edição
   tempo: 0,                                              // instante da animação (segundos)
-  abaEsq: 'camadas', abaDir: 'transformar',              // abas abertas nos painéis laterais
+  abaEsq: 'transformar', abaDir: 'camadas',              // abas abertas nos painéis laterais
 };
 
 // ── utilitários ──

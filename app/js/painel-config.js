@@ -49,7 +49,10 @@ $('cfgMods').addEventListener('change', (ev) => {
   const papel = ev.target.dataset.papel;
   if (papel) { definirMod(papel, ev.target.value); desenhar(); }
 });
-$('cfgPadrao').onclick = () => { voltarAoPadrao(); capturando = null; recado = 'tudo voltou ao padrão'; desenhar(); };
+$('cfgPadrao').onclick = () => {
+  // (não tem desfazer: as teclas trocadas se perdem)
+  if (!confirm('Voltar TODAS as teclas e as teclas do mouse ao padrão?\n\nAs que você trocou se perdem (isto não tem desfazer).')) return;
+  voltarAoPadrao(); capturando = null; recado = 'tudo voltou ao padrão'; desenhar(); };
 
 // a tecla nova: a primeira combinação apertada depois de clicar no botão (Esc desiste)
 addEventListener('keydown', (ev) => {

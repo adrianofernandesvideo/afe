@@ -7,7 +7,7 @@ import { api, urlArte } from './api.js';
 export const aoCarregar = [];
 // versão da arte/edicoes-lib.js que acompanha este editor. Arte com cópia mais antiga continua abrindo,
 // mas as funções novas não aparecem nela: o editor avisa para rodar o ligar.py (ele atualiza a cópia).
-export const LIB_ATUAL = 2.8;
+export const LIB_ATUAL = 2.91;
 let carregando = false, marca = null, cargas = 0;
 const quadro = $('quadro');
 
@@ -28,6 +28,7 @@ export function nomeDe(el) {
   const arq = (src) => { const s = (src || '').split('/').pop().split('?')[0]; try { return decodeURIComponent(s); } catch (e) { return s; } };
   const curto = (t, n) => (t.length > n ? t.slice(0, n - 1) + '…' : t);
   const t = (el.textContent || '').trim().replace(/\s+/g, ' ');
+  if (eNovo(el) && el.dataset.edGrao) return '★ granulado';
   if (eNovo(el)) return '★ ' + (el.dataset.edFundo ? 'fundo · ' : '') + (el.dataset.edPeca ? el.dataset.edPeca + ' ' : '') + (el.tagName === 'IMG' ? arq(el.getAttribute('src')) : t ? `“${curto(t, 24)}”` : 'forma');
   if (el.dataset && el.dataset.nome) return el.dataset.nome;            // a arte pode dar o nome: data-nome="Título"
   if (el.tagName === 'CANVAS') return 'fundo (desenho)';

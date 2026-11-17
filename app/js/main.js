@@ -41,6 +41,8 @@ import { listarArtes } from './barra-topo.js';
 import './barra-tempo.js';
 import './campos.js';
 import './atalhos.js';
+import './lista-atalhos.js';
+import './importar.js';
 import * as config from './config.js';
 import { abrirConfig } from './painel-config.js';
 

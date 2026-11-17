@@ -52,7 +52,9 @@ window.EDICOES = {
       { "id": "n4", "tipo": "img", "src": "assets/x.webp", "fundo": true, "escondeu": ["0"] },  // background image
       { "id": "n5", "tipo": "html", "nome": "Badge", "html": "<span class=…>New</span>",        // code component
         "css": ["assets/biblioteca/Marca/css/tokens.css"], "contexto": { "fontFamily": "…", "color": "…" },
-        "estilo": ".row{display:flex}", "w": 420, "left": 0, "top": 0 }
+        "estilo": ".row{display:flex}", "w": 420, "left": 0, "top": 0 },
+      { "id": "n6", "tipo": "granulado", "w": 1080, "h": 1350, "left": 0, "top": 0,              // film grain
+        "gr": { "int": 0.5, "tam": 1, "cor": false, "anim": true } }   // strength 0–1 · 1/2/3 px · color · "boils"
     ],
     "5/0": {                            // edits for ONE layer, by its position (see "path")
       "sig": "h2.titulo",               // tag.class: checks it's still the same element
@@ -63,6 +65,8 @@ window.EDICOES = {
       "trava": true,                    // layer locked in the editor (clicks pass through); the art ignores it
       "html": "new text",               // text (innerHTML)
       "filtro": "…", "tsombra": "…", "csombra": "…", "cor": "…",   // filter / text-shadow / box-shadow / color
+      "mix": "multiply",                // blend mode → mix-blend-mode; none = normal
+      "apagado": true,                  // deleted in the editor: hidden from the art (display:none) and the layer list
       "raio": 24,                       // corners: number = px, string = "50%"
       "bg": "…", "bd": "…",             // ready-made CSS background / border
       "forma": { "fill": {…}, "stroke": {…}, "orig": {…} },        // state of the Shape tab controls
@@ -159,6 +163,12 @@ file never points outside the art's folder. `PULAR` (folder names to skip, lower
 `<!-- @dsCard group="Elementos" width=1080 height=240 -->`), `components/<Name>/README.md` (how to use it) and
 the brand's `.css` files at the root and in `components/`. `GET /api/pecas` lists; `GET /ds/<library>/...`
 serves the files (the preview comes with `<base>` and the CSS `<link>` tags already in place);
+**Images from the computer:** `POST /api/importar {arquivo, destino, nome, dados(base64)}` writes to
+`<art folder>/assets/importadas/` (destino `arte`) or `<root>/assets-gerais/` (destino `geral`). Only PNG, JPG,
+WebP, GIF and AVIF, checked by their first bytes; the name is cleaned (no folders) and nothing is replaced.
+`assets-gerais` is registered as one more library (**Assets gerais**), so copying into the art uses the usual
+`/api/usar-asset`; it's in `PULAR` (it doesn't show up again as images of the art's folder).
+
 `POST /api/usar-peca` copies into the art the CSS (without `@import` of internet addresses) and the requested
 images. The preview runs on the editor's origin (like the art): only point `--biblioteca` at folders you
 trust.
@@ -202,6 +212,8 @@ Everything in `app/js/`. Each file starts with a comment saying what it does. De
 | `painel-pecas.js` | design system code components: list in the Assets tab, "Escolher peça" window, insertion |
 | `folha.js` | keyframe sheet: drawing, marked keys, layer bar, drags, right-click menu |
 | `barra-topo.js` · `barra-tempo.js` · `campos.js` · `atalhos.js` | wiring to the interface. `atalhos.js` = the `COMANDOS` table (default key, when it applies, what it does) |
+| `lista-atalhos.js` | the "Atalhos" list in the Transformar tab (one per line), with keys read from the preferences |
+| `importar.js` | images from the computer (drop on the art → `assets/importadas/`; on the Assets tab → Assets gerais) |
 | `config.js` · `painel-config.js` | user preferences (each command's key, the role of Shift/Alt/Ctrl), stored in `localStorage` · the ⚙ screen |
 | `main.js` | entry point: imports everything, exposes `window.ED` (debugging/tests), opens the art |
 

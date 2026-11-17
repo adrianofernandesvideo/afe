@@ -4,6 +4,40 @@
 
 Mais novo em cima. Ao mudar algo, acrescente uma linha aqui (e na versão em inglês).
 
+## 2.4 beta — 2026-11-17 · mesclagem, granulado, imagens do computador e tela reorganizada
+
+**Novidades**
+- **Mesclagem (blend mode)** por camada, com os modos do Photoshop que o navegador tem (Multiplicação, Tela,
+  Sobrepor, Luz suave, Diferença, Cor…): no topo da aba Camadas e no botão direito (*Mesclagem ▸*). Campo `mix`.
+- **Granulado:** item novo na aba Assets (Grão). Grão gerado pela própria arte (sem imagem), com força, tamanho,
+  cor e animado ("ferve" 12×/s, sempre igual no mesmo instante: o vídeo bate com o editor). Entra travado e em
+  Sobrepor; ajustes na aba Forma.
+- **Imagens do computador:** solte um PNG/JPG/WebP/GIF/AVIF em cima da arte (vira camada; arquivo em
+  `assets/importadas/`) ou na aba Assets (vai para **★ Assets gerais**, `assets-gerais/` na pasta das artes, e
+  vale para todas as artes). Rota nova `/api/importar`, que confere o conteúdo e nunca troca arquivo existente.
+  Funciona também na demo online (fica no navegador).
+- **Loop:** botão ⟲ na barra de baixo (aceso por padrão; apagado = toca uma vez). Shift + play faz o contrário,
+  só daquela vez. Fica guardado no navegador.
+
+**Tela**
+- Efeitos (Transformar, Efeitos, Forma, Animação) à **esquerda**; Camadas e Assets à **direita**.
+- Barra de baixo reorganizada: tempo à esquerda, play no centro exato, chaves e curva logo depois, Motion Blur,
+  Capa e Gerar vídeo à direita; ✕ vermelho apaga a chave.
+- Atalhos da aba Transformar em lista (um por linha, em grupos), com as teclas lidas do ⚙.
+- Aba Transformar em linhas: **Posição** (X e Y lado a lado), **Tamanho**, **Esticar** (L 🔗 A, com corrente que
+  liga largura e altura na mesma proporção), **Girar**, **Opacidade**. Cada linha com ‹ ◇ › (um ◇ para o par) e
+  **↺** que volta só aquela linha ao padrão.
+- Barra de baixo sempre numa linha, com os grupos separados; em telas menores os botões ficam só com o ícone.
+- Barras de cima centralizadas como a de baixo, com os grupos separados; **↶ Desfazer / ↷ Refazer** com nome.
+- Caixas de número com a unidade dentro (px, %, °, em cinza; só visual), todas do mesmo tamanho; mais espaço e uma
+  linha fina entre as seções das abas; Esconder no título; lista de Atalhos recolhível (▸/▾).
+- **Apagar** vale também para elementos da arte (🗑, Delete ou botão direito): somem da arte e da lista, com
+  confirmação; voltam com Ctrl+Z ou "Restaurar apagados". Campo `apagado` (biblioteca 2.91).
+- Confirmação antes de **Voltar ao original** e de **Voltar tudo ao padrão** (⚙); aviso de quanto o motion blur
+  deixa o vídeo mais lento.
+
+**Biblioteca da arte:** versão 2.91 (`mix`, o item `granulado` e `apagado`). Rode o `ligar.py` nas suas artes para atualizar.
+
 ## 2.3 beta — 2026-11-16 · releases automáticos, executável e demo online
 
 - **Endereço com modo:** `?modo=editar` ou `?modo=animar` abre o editor já com o modo ligado (no animar, a

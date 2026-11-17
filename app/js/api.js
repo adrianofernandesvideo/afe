@@ -24,6 +24,8 @@ export const api = {
   // prepara a arte para uma peça: copia o CSS da marca e as imagens dela → { css: [...], imagens: {pedida: caminho} }
   usarPeca: (arquivo, biblioteca, imagens) => pedir(BASE + '/api/usar-peca', { arquivo, biblioteca, imagens }),
   marcas: (arquivo) => pedir(BASE + '/api/marcas?arquivo=' + encodeURIComponent(arquivo)),   // { marca } muda se o arquivo mudar
+  // imagem do computador: destino 'arte' → { src } (a partir da pasta da arte) · 'geral' → { biblioteca, asset }
+  importar: (arquivo, destino, nome, dados) => pedir(BASE + '/api/importar', { arquivo, destino, nome, dados }),
   salvar: (arquivo, edicoes) => pedir(BASE + '/api/salvar', { arquivo, edicoes }),
   video: (arquivo, pagina) => pedir(BASE + '/api/video', { arquivo, pagina }),      // { id }
   videoStatus: (id) => pedir(BASE + '/api/video-status?id=' + encodeURIComponent(id)),

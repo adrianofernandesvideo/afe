@@ -11,25 +11,38 @@
 </head>
 <body>
 <div class="barra" id="topo">
-  <button id="btnEsq" class="so-editando" title="Mostrar/esconder o painel da esquerda (Camadas e Assets)">◧</button>
-  <button id="ant" title="Página anterior (←)">◀</button>
-  <span id="pag">–</span>
-  <button id="prox" title="Próxima página (→)">▶</button>
-  <input id="arq" type="text" list="listaArtes" spellcheck="false" placeholder="escolha ou digite a arte…"
-    title="Arte aberta (caminho dentro da pasta das artes). Clique para escolher outra.">
-  <datalist id="listaArtes"></datalist>
-  <button id="btnEditar" title="Liga/desliga a edição manual">✎ Editar</button>
-  <button id="btnAnimar" title="Linha do tempo: keyframes e animações">🎬 Animar</button>
-  <span class="sep so-editando"></span>
-  <button id="btnDesf" class="so-editando" title="Desfazer (Ctrl+Z)">↶</button>
-  <button id="btnRefazer" class="so-editando" title="Refazer (Ctrl+Shift+Z ou Ctrl+Y)">↷</button>
-  <button id="btnSalvar" class="salvar so-editando" title="Salvar (Ctrl+S)">💾 Salvar</button>
-  <span id="status">carregando…</span>
-  <button id="btnConfig" title="Configurações: atalhos de teclado e teclas do mouse">⚙</button>
-  <button id="btnDir" class="so-editando" title="Mostrar/esconder o painel da direita (propriedades)">◨</button>
+  <!-- três colunas, como a barra de baixo: páginas e arte | modos, desfazer/refazer, salvar (no centro) | status e ⚙ -->
+  <div class="tp-lado tp-esq">
+    <button id="btnEsq" class="so-editando" title="Mostrar/esconder o painel da esquerda (Transformar, Efeitos, Forma, Animação)">◧</button>
+    <span class="tp-grupo">
+      <button id="ant" title="Página anterior (←)">◀</button>
+      <span id="pag">–</span>
+      <button id="prox" title="Próxima página (→)">▶</button>
+    </span>
+    <input id="arq" type="text" list="listaArtes" spellcheck="false" placeholder="escolha ou digite a arte…"
+      title="Arte aberta (caminho dentro da pasta das artes). Clique para escolher outra.">
+    <datalist id="listaArtes"></datalist>
+  </div>
+  <div class="tp-centro">
+    <span class="tp-grupo">
+      <button id="btnEditar" title="Liga/desliga a edição manual">✎ Editar</button>
+      <button id="btnAnimar" title="Linha do tempo: keyframes e animações">🎬 Animar</button>
+    </span>
+    <span class="tp-grupo so-editando">
+      <button id="btnDesf" title="Desfazer (Ctrl+Z)">↶<span class="lt-txt"> Desfazer</span></button>
+      <button id="btnRefazer" title="Refazer (Ctrl+Shift+Z ou Ctrl+Y)">↷<span class="lt-txt"> Refazer</span></button>
+    </span>
+    <button id="btnSalvar" class="salvar so-editando" title="Salvar (Ctrl+S)">💾 Salvar</button>
+  </div>
+  <div class="tp-lado tp-dir">
+    <span id="status">carregando…</span>
+    <button id="btnConfig" title="Configurações: atalhos de teclado e teclas do mouse">⚙</button>
+    <button id="btnDir" class="so-editando" title="Mostrar/esconder o painel da direita (Camadas e Assets)">◨</button>
+  </div>
 </div>
 
 <div class="barra" id="rapida">
+  <span class="tp-grupo">
   <span class="rot">Alinhar na arte</span>
   <button data-al="esq" title="Encostar na esquerda da arte"></button>
   <button data-al="ch" title="Centralizar na horizontal"></button>
@@ -37,47 +50,24 @@
   <button data-al="topo" title="Encostar no topo da arte"></button>
   <button data-al="cv" title="Centralizar na vertical"></button>
   <button data-al="base" title="Encostar na base da arte"></button>
-  <span class="sep"></span>
+  </span>
+  <span class="tp-grupo">
   <label>Opacidade <input id="rpO" type="range" data-padrao="100" min="0" max="100" step="1"> <input id="rpOn" type="number" min="0" max="100" step="5"></label>
-  <span class="sep"></span>
+  </span>
+  <span class="tp-grupo">
   <button id="rpFrente" title="Traz para a frente">⤒ Frente</button>
   <button id="rpTras" title="Manda para trás">⤓ Trás</button>
-  <span class="sep"></span>
+  </span>
+  <span class="tp-grupo">
   <button id="rpOlho" title="Esconder / mostrar">👁 Esconder</button>
   <button id="rpTrava" title="Travar: o clique na arte passa por esta camada (Ctrl+clique seleciona mesmo assim)">🔒 Travar</button>
   <button id="rpOrig" title="Tira todas as edições e volta ao original">↺ Original</button>
+  </span>
 </div>
 
 <div id="area">
   <aside id="esq" class="lateral">
     <div class="abas" data-lado="esq">
-      <button data-aba="camadas" class="ativo">Camadas</button>
-      <button data-aba="assets">Assets</button>
-    </div>
-    <div class="painel ativo" id="pn-camadas"></div>
-    <div class="painel" id="pn-assets">
-      <input id="buscaAsset" type="text" placeholder="Buscar asset…">
-      <p class="dica">Arraste para a arte (ou clique para pôr no centro). ★ = biblioteca de assets da marca.
-        Passe o mouse numa imagem e clique em <b>fundo</b> para usá-la como fundo da arte. Em <b>Peças</b>, clique
-        numa peça para escolher o pedaço e pôr na arte.</p>
-      <div id="listaPecas"></div>
-      <div id="listaAssets"><div class="vazio">carregando…</div></div>
-    </div>
-  </aside>
-
-  <main>
-    <div id="moldura">
-      <iframe id="quadro" title="arte"></iframe>
-      <div id="caixasExtra"></div>
-      <div class="caixa" id="caixaHover"></div>
-      <div class="caixa" id="caixaSel"><i class="alca canto" data-h="-1,-1"></i><i class="alca lado-y" data-h="0,-1"></i><i class="alca canto" data-h="1,-1"></i><i class="alca lado-x" data-h="1,0"></i><i class="alca canto" data-h="1,1"></i><i class="alca lado-y" data-h="0,1"></i><i class="alca canto" data-h="-1,1"></i><i class="alca lado-x" data-h="-1,0"></i><i class="alca giro" data-h="giro" title="Girar (Shift: de 15 em 15 graus)"></i></div>
-      <div class="guia" id="guiaV"></div>
-      <div class="guia" id="guiaH"></div>
-    </div>
-  </main>
-
-  <aside id="dir" class="lateral">
-    <div class="abas" data-lado="dir">
       <button data-aba="transformar" class="ativo">Transformar</button>
       <button data-aba="efeitos">Efeitos</button>
       <button data-aba="forma">Forma</button>
@@ -90,16 +80,24 @@
         <button id="btnTexto" title="Editar o texto (ou duplo clique)">✎ Texto</button>
         <button id="btnOrig" title="Tira todas as edições e volta ao original">↺ Original</button>
       </div>
-      <h4>Posição e tamanho</h4>
-      <div class="grade2">
-        <label>X <span class="lado"><input id="inX" type="number" step="1"><span class="kfs" data-kf="x"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
-        <label>Y <span class="lado"><input id="inY" type="number" step="1"><span class="kfs" data-kf="y"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
-        <label>Tamanho % <span class="lado"><input id="inS" type="number" step="1" min="5"><span class="kfs" data-kf="s"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
-        <label title="Estica só a largura (100 = normal)">Largura % <span class="lado"><input id="inSX" type="number" step="1" min="5"><span class="kfs" data-kf="sx"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
-        <label title="Estica só a altura (100 = normal)">Altura % <span class="lado"><input id="inSY" type="number" step="1" min="5"><span class="kfs" data-kf="sy"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
-        <label>Girar ° <span class="lado"><input id="inR" type="number" step="1"><span class="kfs" data-kf="r"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
-        <label>Opacidade % <span class="lado"><input id="inO" type="number" step="5" min="0" max="100"><span class="kfs" data-kf="o"><button data-d="-1" title="Chave anterior desta propriedade">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave desta propriedade">›</button></span></span></label>
-        <label style="justify-content:flex-start"><input id="inOculto" type="checkbox"> Esconder</label>
+      <h4 class="com-acao">Posição e tamanho <label class="tf-esconder" title="Esconde o elemento (o 👁 da lista de camadas)"><span>Esconder</span><input id="inOculto" type="checkbox"></label></h4>
+      <!-- grade: nome · eixo · caixa · (corrente) · eixo · caixa · ‹ ◇ › · ↺ — todas as caixas do mesmo tamanho -->
+      <div class="tf">
+        <div class="tf-linha"><span class="tf-nome">Posição</span>
+          <span class="tf-eixo">X</span><span class="cx" data-un="px"><input id="inX" type="number" step="1"></span><span></span><span class="tf-eixo">Y</span><span class="cx" data-un="px"><input id="inY" type="number" step="1"></span>
+          <span class="kfs" data-kf="x,y"><button data-d="-1" title="Chave anterior">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave">›</button></span><button class="tf-reset" data-reset="x,y" title="Voltar a posição ao padrão">↺</button></div>
+        <div class="tf-linha"><span class="tf-nome">Tamanho</span>
+          <span class="tf-eixo"></span><span class="cx" data-un="%"><input id="inS" type="number" step="1" min="5"></span><span></span><span></span><span></span>
+          <span class="kfs" data-kf="s"><button data-d="-1" title="Chave anterior">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave">›</button></span><button class="tf-reset" data-reset="s" title="Voltar o tamanho ao padrão">↺</button></div>
+        <div class="tf-linha" title="Estica só a largura ou só a altura (100% = normal)"><span class="tf-nome">Esticar</span>
+          <span class="tf-eixo">L</span><span class="cx" data-un="%"><input id="inSX" type="number" step="1" min="5"></span><button id="btnElo" class="tf-elo ativo" title="Largura e altura ligadas: mudar uma muda a outra na mesma proporção. Clique para soltar."><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button><span class="tf-eixo">A</span><span class="cx" data-un="%"><input id="inSY" type="number" step="1" min="5"></span>
+          <span class="kfs" data-kf="sx,sy"><button data-d="-1" title="Chave anterior">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave">›</button></span><button class="tf-reset" data-reset="sx,sy" title="Voltar a largura e a altura ao padrão">↺</button></div>
+        <div class="tf-linha"><span class="tf-nome">Girar</span>
+          <span class="tf-eixo"></span><span class="cx" data-un="°"><input id="inR" type="number" step="1"></span><span></span><span></span><span></span>
+          <span class="kfs" data-kf="r"><button data-d="-1" title="Chave anterior">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave">›</button></span><button class="tf-reset" data-reset="r" title="Voltar o giro ao padrão">↺</button></div>
+        <div class="tf-linha"><span class="tf-nome">Opacidade</span>
+          <span class="tf-eixo"></span><span class="cx" data-un="%"><input id="inO" type="number" step="5" min="0" max="100"></span><span></span><span></span><span></span>
+          <span class="kfs" data-kf="o"><button data-d="-1" title="Chave anterior">‹</button><button data-d="0">◇</button><button data-d="1" title="Próxima chave">›</button></span><button class="tf-reset" data-reset="o" title="Voltar a opacidade ao padrão">↺</button></div>
       </div>
       <h4>Alinhar</h4>
       <div class="botoes">
@@ -110,15 +108,10 @@
           <option value="bloco">no bloco de fora</option>
         </select>
       </div>
-      <h4>Atalhos</h4>
-      <p class="dica">Clique seleciona · <b>Shift+clique</b> soma à seleção · arraste move (gruda no centro) — enquanto arrasta:
-        <b>Shift</b> trava no eixo, <b>Alt</b> anda devagar, <b>Ctrl</b> solta o ímã · alças da caixa: cantos = tamanho
-        (Shift = livre), lados = largura/altura, bolinha = girar (Shift = de 15 em 15°), Alt = a partir do centro · <b>botão direito</b> = menu da
-        camada · <b>Alt + roda</b> alterna entre os elementos embaixo do mouse · camada travada: Ctrl+clique seleciona · nos campos de número, clique e
-        arraste para os lados para mudar o valor (Shift rápido, Alt fino)
-        · setas movem 1 px (Shift: 10) · roda do mouse muda o tamanho · duplo clique edita o texto (Esc termina)
-        · Delete apaga um item acrescentado · Esc solta a seleção · Ctrl+Z desfaz · Ctrl+Shift+Z refaz · Ctrl+S salva.
-        Com vários selecionados, mover, tamanho, giro, opacidade e alinhar valem para todos. <b>⚙</b> (no topo) mostra e troca todos os atalhos.</p>
+      <h4 class="recolhe"><button id="btnAtalhos" class="seta-recolhe" title="Mostrar / esconder os atalhos" aria-expanded="true">▾</button> Atalhos</h4>
+      <div id="listaAtalhos" class="atalhos"></div>
+      <p class="dica">Com vários selecionados, mover, tamanho, giro, opacidade e alinhar valem para todos.
+        <b>⚙</b> (no topo) mostra e troca as teclas.</p>
     </div>
     <div class="painel" id="pn-efeitos"></div>
     <div class="painel" id="pn-forma"></div>
@@ -155,31 +148,74 @@
         escolhe o easing, Ctrl+C / Ctrl+V copiam e colam chaves. Botão direito num losango mostra tudo.</p>
     </div>
   </aside>
+
+  <main>
+    <div id="moldura">
+      <iframe id="quadro" title="arte"></iframe>
+      <div id="caixasExtra"></div>
+      <div class="caixa" id="caixaHover"></div>
+      <div class="caixa" id="caixaSel"><i class="alca canto" data-h="-1,-1"></i><i class="alca lado-y" data-h="0,-1"></i><i class="alca canto" data-h="1,-1"></i><i class="alca lado-x" data-h="1,0"></i><i class="alca canto" data-h="1,1"></i><i class="alca lado-y" data-h="0,1"></i><i class="alca canto" data-h="-1,1"></i><i class="alca lado-x" data-h="-1,0"></i><i class="alca giro" data-h="giro" title="Girar (Shift: de 15 em 15 graus)"></i></div>
+      <div class="guia" id="guiaV"></div>
+      <div class="guia" id="guiaH"></div>
+    </div>
+  </main>
+
+  <aside id="dir" class="lateral">
+    <div class="abas" data-lado="dir">
+      <button data-aba="camadas" class="ativo">Camadas</button>
+      <button data-aba="assets">Assets</button>
+    </div>
+    <div class="painel ativo" id="pn-camadas"></div>
+    <div class="painel" id="pn-assets">
+      <input id="buscaAsset" type="text" placeholder="Buscar asset…">
+      <p class="dica"><b>Do computador:</b> solte uma imagem aqui (vai para ★ Assets gerais, vale para todas as artes) ou
+        em cima da arte (vira camada só desta arte).</p>
+      <p class="dica">Arraste para a arte (ou clique para pôr no centro). ★ = biblioteca de assets da marca.
+        Passe o mouse numa imagem e clique em <b>fundo</b> para usá-la como fundo da arte. Em <b>Peças</b>, clique
+        numa peça para escolher o pedaço e pôr na arte.</p>
+      <div id="listaPecas"></div>
+      <div id="listaAssets"><div class="vazio">carregando…</div></div>
+    </div>
+  </aside>
 </div>
 
 <div id="folha"></div>
 <div class="barra" id="linhaTempo">
-  <button id="btnFrAnt" title="Frame anterior ( , )">◂</button>
-  <button id="btnPlay" title="Tocar / pausar (espaço)">▶</button>
-  <button id="btnFrProx" title="Próximo frame ( . )">▸</button>
-  <span id="tempoTxt">frame 0</span>
-  <label>Duração <input id="inDur" type="number" min="1" max="60" step="0.5" value="5"> s</label>
-  <span class="sep"></span>
-  <button id="btnKfAnt" title="Keyframe anterior">‹</button>
-  <button id="btnKf" title="Grava posição, tamanho, giro, opacidade e brilho neste frame">◆ Chave</button>
-  <button id="btnKfProx" title="Próximo keyframe">›</button>
-  <button id="btnKfDel" title="Apaga o keyframe deste frame">✕ Chave</button>
-  <button id="btnCurva" title="Curva (easing): como o valor anda desta chave até a próxima. Vale para as chaves marcadas na folha (ou a do frame atual). Também no botão direito do losango.">Curva
-    <span id="curvaGraf"></span><span id="curvaNome">Suave</span> ▾</button>
-  <button id="btnKfCopiar" title="Copiar as chaves marcadas na folha, ou a do frame atual (Ctrl+C)">⧉ Copiar</button>
-  <button id="btnKfColar" title="Colar as chaves onde a cabeça está, nos elementos selecionados (Ctrl+V)">⎘ Colar</button>
-  <span class="sep"></span>
-  <button id="btnCapa" title="Usa o frame atual como CAPA: é o que aparece no PNG e fora do modo Animar. Padrão: o último frame, quando tudo já entrou. (▼ na régua)">🖼 Capa</button>
-  <label title="Motion blur no VÍDEO desta página: rastro de movimento, como numa câmera. A prévia aqui e o PNG ficam sem. Com blur o vídeo demora mais para gerar (4× leve, 8× normal, 12× forte).">Blur
-    <select id="selMb"><option value="0">sem</option><option value="0.25">leve</option><option value="0.5">normal</option><option value="1">forte</option></select></label>
-  <button id="btnVideo" title="Gera o MP4 desta página (salva antes)">🎞 Gerar vídeo</button>
-  <span id="videoStatus"></span>
-  <button id="btnMini" title="Minimizar a linha do tempo">▾</button>
+  <!-- três colunas: tempo + copiar/colar | tocar (no centro exato da barra) | chaves e curva + vídeo -->
+  <div class="lt-lado lt-esq">
+    <label>Duração <input id="inDur" type="number" min="1" max="60" step="0.5" value="5"> s</label>
+    <span id="tempoTxt">frame 0</span>
+    <span class="lt-mola"></span>
+    <span class="lt-grupo">
+    <button id="btnKfCopiar" title="Copiar as chaves marcadas na folha, ou a do frame atual (Ctrl+C)">⧉<span class="lt-txt"> Copiar</span></button>
+    <button id="btnKfColar" title="Colar as chaves onde a cabeça está, nos elementos selecionados (Ctrl+V)">⎘<span class="lt-txt"> Colar</span></button>
+    </span>
+  </div>
+  <div class="lt-centro">
+    <button id="btnLoop" class="lt-icone" title="Repetir (loop). Aceso: o play toca em loop · apagado: toca uma vez e para no fim. Shift + play faz o contrário só daquela vez."><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
+    <button id="btnFrAnt" class="lt-icone" title="Frame anterior ( , )">◂</button>
+    <button id="btnPlay" class="lt-play" title="Tocar / pausar (espaço) · Shift: o contrário do loop, só desta vez">▶</button>
+    <button id="btnFrProx" class="lt-icone" title="Próximo frame ( . )">▸</button>
+  </div>
+  <div class="lt-lado lt-dir">
+    <span class="lt-grupo">
+    <button id="btnKfAnt" class="lt-icone" title="Keyframe anterior">‹</button>
+    <button id="btnKf" title="Grava posição, tamanho, giro, opacidade e brilho neste frame">◆<span class="lt-txt"> Chave</span></button>
+    <button id="btnKfProx" class="lt-icone" title="Próximo keyframe">›</button>
+    <button id="btnKfDel" class="lt-icone lt-apagar" title="Apaga o keyframe deste frame">✕</button>
+    </span>
+    <button id="btnCurva" title="Curva (easing): como o valor anda desta chave até a próxima. Vale para as chaves marcadas na folha (ou a do frame atual). Também no botão direito do losango.">Curva
+      <span id="curvaGraf"></span><span id="curvaNome">Suave</span> ▾</button>
+    <span class="lt-mola"></span>
+    <span class="lt-grupo lt-saida">
+    <label title="Motion blur no VÍDEO desta página: rastro de movimento, como numa câmera. A prévia aqui e o PNG ficam sem. Com blur o vídeo demora mais para gerar (4× leve, 8× normal, 12× forte)."><span class="lt-txt">Motion </span>Blur
+      <select id="selMb"><option value="0">sem</option><option value="0.25">leve</option><option value="0.5">normal</option><option value="1">forte</option></select></label>
+    <button id="btnCapa" title="Usa o frame atual como CAPA: é o que aparece no PNG e fora do modo Animar. Padrão: o último frame, quando tudo já entrou. (▼ na régua)">🖼<span class="lt-txt"> Capa</span></button>
+    <button id="btnVideo" title="Gera o MP4 desta página (salva antes)">🎞<span class="lt-txt"> Gerar vídeo</span></button>
+    <span id="videoStatus"></span>
+    </span>
+    <button id="btnMini" title="Minimizar a linha do tempo">▾</button>
+  </div>
 </div>
 
 <div id="pecas" class="janela" hidden>

@@ -5,7 +5,7 @@
 import { S, $, limitar, ouvir } from './base.js';
 import { entrada, atual, mudar, removerEdicoes } from './doc.js';
 import { alinhar } from './alinhar.js';
-import { mudarOrdem, alternarOculto, alternarTrava } from './camada-acoes.js';
+import { mudarOrdem, alternarOculto, alternarTrava, confirmarOriginal } from './camada-acoes.js';
 
 const barra = $('rapida');
 
@@ -43,4 +43,4 @@ $('rpFrente').onclick = () => mudarOrdem(1);
 $('rpTras').onclick = () => mudarOrdem(-1);
 $('rpOlho').onclick = () => alternarOculto();
 $('rpTrava').onclick = () => alternarTrava();
-$('rpOrig').onclick = () => removerEdicoes();
+$('rpOrig').onclick = () => confirmarOriginal();

@@ -8,7 +8,8 @@ import { selecionar, definirHover } from './selecao.js';
 import { definirEdicao, visivel } from './paineis.js';
 import { removerNovos, novosSelecionados } from './painel-assets.js';
 import { temTempo } from './tempo-camada.js';
-import { mudarOrdem, alternarOculto, alternarTrava, itensDeCamada } from './camada-acoes.js';
+import { mudarOrdem, alternarOculto, alternarTrava, itensDeCamada, definirMescla, apagarCamadas, apagados, restaurarApagados } from './camada-acoes.js';
+import { MESCLAS } from './presets.js';
 import { abrirMenu } from './menu.js';
 
 const caixa = $('pn-camadas');
@@ -27,7 +28,7 @@ let visto = '';
 function resumoDoDoc() {
   const P = pag();
   return Object.entries(P).map(([c, e]) => (c[0] === '_' ? '' :
-    c + (e.oculto ? 'o' : '') + (e.kf ? 'k' : '') + (e.anim ? 'a' : '') + (temTempo(e) ? 't' : '') + (e.ent ? 'e' : '') + (e.trava ? 'T' : '') + (e.html != null ? 'h' + e.html.length : ''))).join('|')
+    c + (e.apagado ? 'X' : '') + (e.oculto ? 'o' : '') + (e.kf ? 'k' : '') + (e.anim ? 'a' : '') + (temTempo(e) ? 't' : '') + (e.ent ? 'e' : '') + (e.trava ? 'T' : '') + (e.mix ? 'm' + e.mix : '') + (e.html != null ? 'h' + e.html.length : ''))).join('|')
     + '#' + (P._novos || []).map((n) => n.id + (n.html || '').length).join(',');
 }
 function desenhar() {
@@ -52,13 +53,14 @@ function desenhar() {
         c += '/' + [...ch.children].indexOf(d);
         ch = d;
       }
+      if ((P[c] || {}).apagado) continue;                   // apagada: some da lista (volta em "Restaurar apagados")
       const e = P[c] || {}, temDentro = nivel < 7 && [...ch.children].some(visual), aberto = abertas.has(c);
       const cls = (c === S.selCaminho ? 'sel' : S.selPaths.includes(c) ? 'extra' : '')
         + (ch.tagName === 'CANVAS' ? ' fundo' : '') + (e.oculto ? ' oculto' : '') + (e.trava ? ' travada' : '');
       linhas.push(`<div class="cam ${cls}" data-c="${esc(c)}" style="padding-left:${8 + nivel * 14}px">
         <span class="seta" data-acao="abrir">${temDentro ? (aberto ? '▾' : '▸') : ''}</span>
         <span class="olho" data-acao="olho" title="Mostrar / esconder">${e.oculto ? '◌' : '👁'}</span>
-        <span class="nome">${esc(nomeDe(ch))}</span>${e.trava ? '<span class="cadeado" data-acao="trava" title="Travada: o clique na arte passa por ela. Clique aqui para destravar.">🔒</span>' : ''}${e.kf || e.anim || e.ent || temTempo(e) ? '<span class="tag" title="animado">🎬</span>' : ''}</div>`);
+        <span class="nome">${esc(nomeDe(ch))}</span>${e.trava ? '<span class="cadeado" data-acao="trava" title="Travada: o clique na arte passa por ela. Clique aqui para destravar.">🔒</span>' : ''}${e.mix ? '<span class="tag" title="modo de mesclagem: ' + esc(e.mix) + '">◐</span>' : ''}${e.kf || e.anim || e.ent || temTempo(e) ? '<span class="tag" title="animado">🎬</span>' : ''}</div>`);
       if (temDentro && aberto) andar(ch, c, nivel + 1);
     }
   })(raiz(), '', 0);
@@ -67,8 +69,12 @@ function desenhar() {
     <h4>Camadas <span class="botoes" style="margin:0">
       <button data-acao="frente" ${tem ? '' : 'disabled'} title="Traz para a frente">⤒ Frente</button>
       <button data-acao="tras" ${tem ? '' : 'disabled'} title="Manda para trás">⤓ Trás</button>
-      <button data-acao="apagar" ${novosSelecionados() ? '' : 'disabled'} title="Apaga um item acrescentado (★)">🗑</button></span></h4>
-    <p class="dica">O de cima da lista fica na frente. ★ = acrescentado por você. Shift+clique seleciona vários.</p>
+      <button data-acao="apagar" ${tem ? '' : 'disabled'} title="Apagar a camada selecionada (Delete). O código da arte não muda: Ctrl+Z ou 'Restaurar apagados' trazem de volta.">🗑</button></span></h4>
+    <label class="mescla" title="Modo de mesclagem (blend mode) da camada selecionada, como no Photoshop. Também no botão direito.">Mesclagem
+      <select data-acao="mescla" ${tem ? '' : 'disabled'}>${MESCLAS.map((m) => (m === '-' ? '<option disabled>──────────</option>'
+        : `<option value="${m[0]}" ${m[0] === ((P[S.selCaminho] || {}).mix || 'normal') ? 'selected' : ''}>${m[1]}</option>`)).join('')}</select></label>
+    ${apagados().length ? `<p class="dica apagados">${apagados().length} apagada(s) · <a href="#" data-acao="restaurar">restaurar</a></p>` : ''}
+    <p class="dica">O de cima da lista fica na frente. ★ = acrescentado por você. ◐ = com mesclagem. Shift+clique seleciona vários.</p>
     <div class="cams">${linhas.join('')}</div>`;
   const s = caixa.querySelector('.cam.sel');
   if (s) s.scrollIntoView({ block: 'nearest' });
@@ -87,7 +93,8 @@ caixa.addEventListener('click', (ev) => {
     mudarOrdem(acao === 'frente' ? 1 : -1);
     return;
   }
-  if (acao === 'apagar') { removerNovos(); return; }
+  if (acao === 'apagar') { apagarCamadas(); return; }
+  if (acao === 'restaurar') { ev.preventDefault(); restaurarApagados(); return; }
   if (!linha) return;
   const c = linha.dataset.c, el = achar(c);
   if (acao === 'abrir') { if (abertas.has(c)) abertas.delete(c); else abertas.add(c); visto = ''; desenhar(); return; }
@@ -96,6 +103,9 @@ caixa.addEventListener('click', (ev) => {
   if (acao === 'trava') { alternarTrava([c]); return; }
   definirEdicao(true);
   selecionar(el, ev.shiftKey);
+});
+caixa.addEventListener('change', (ev) => {
+  if (ev.target.matches('select[data-acao="mescla"]')) { definirMescla(ev.target.value); ev.target.blur(); }
 });
 caixa.addEventListener('contextmenu', (ev) => {             // botão direito numa camada
   const linha = ev.target.closest('.cam');

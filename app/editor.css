@@ -76,19 +76,26 @@ body.arrastando iframe { pointer-events:none; }
 
 /* ── paineis laterais ── */
 .lateral { display:none; flex:none; flex-direction:column; background:var(--barra); min-height:0; }
-#esq { width:260px; border-right:1px solid var(--borda); }
-#dir { width:310px; border-left:1px solid var(--borda); }
+/* esquerda: Transformar, Efeitos, Forma, Animação · direita: Camadas e Assets (como no Photoshop) */
+#esq { width:310px; border-right:1px solid var(--borda); }
+#dir { width:260px; border-left:1px solid var(--borda); }
 body.editando.esq-aberto #esq, body.editando.dir-aberto #dir { display:flex; }
 .abas { display:flex; gap:3px; padding:8px 8px 0; }
 .abas button { flex:1; border-radius:6px 6px 0 0; background:#1c1c30; padding:6px 4px; font-size:12.5px; }
 .abas button.ativo { background:#2a2a48; color:var(--ciano); font-weight:600; }
 .painel { flex:1; overflow:auto; padding:10px; border-top:1px solid var(--borda); display:none; }
 .painel.ativo { display:block; }
-.painel h4 { margin:14px 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ciano);
+.painel h4 { margin:24px 0 8px; padding-top:14px; border-top:1px solid #23233a; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ciano);
   display:flex; justify-content:space-between; align-items:center; gap:6px; }
-.painel h4:first-child { margin-top:0; }
+.painel h4:first-child { margin-top:0; padding-top:0; border-top:0; }
 .painel h4 button { padding:3px 8px; font-size:12px; text-transform:none; letter-spacing:0; }
 .dica { color:var(--apagado); font-size:11.5px; margin:0 0 6px; line-height:1.45; }
+/* lista de atalhos (aba Transformar): tecla à esquerda, o que faz à direita */
+.atalhos { font-size:11.5px; margin-bottom:8px; }
+.at-grupo { color:var(--texto); font-weight:600; margin:9px 0 3px; }
+.at-grupo:first-child { margin-top:0; }
+.at-linha { display:grid; grid-template-columns:minmax(0,46%) 1fr; gap:8px; padding:2px 0; color:var(--apagado); line-height:1.35; }
+.at-linha kbd { font:inherit; color:#c9c9dc; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .vazio { color:var(--apagado); font-size:12px; padding:8px 0; }
 .botoes { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
 .grade2 { display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; }
@@ -98,7 +105,6 @@ body.editando.esq-aberto #esq, body.editando.dir-aberto #dir { display:flex; }
 /* botoes de keyframe ao lado dos campos (so com o Animar ligado): chave anterior · por/tirar chave · proxima */
 .kfs { display:none; gap:1px; }
 body.animando .kfs { display:inline-flex; }
-body.animando #pn-transformar .grade2 { grid-template-columns:1fr; }
 .kfs button { padding:3px 5px; font-size:15px; line-height:1; border-radius:4px; background:none; color:#b9b9cc; }
 .kfs button:hover:not(:disabled) { color:var(--texto); }
 .kfs button.ativo { background:none; color:var(--amarelo); }
@@ -156,11 +162,43 @@ body.animando #pn-transformar .grade2 { grid-template-columns:1fr; }
 #selPreset, #selEntrada { width:100%; }
 
 /* ── linha do tempo (baixo) ── */
-#linhaTempo { display:none; border-top:1px solid #000; }
-body.animando #linhaTempo { display:flex; }
+/* três colunas: as dos lados têm a mesma largura (1fr), então o grupo do play fica no centro exato da barra */
+/* entre os grupos de funções: 26px · dentro de um grupo: 4px (Copiar/Colar · tocar · chaves · Curva · saída) */
+#linhaTempo { display:none; border-top:1px solid #000; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:26px; }
+body.animando #linhaTempo { display:grid; }
+.lt-lado { display:flex; align-items:center; gap:26px; min-width:0; }
+.lt-centro, .lt-grupo { display:flex; align-items:center; gap:4px; min-width:0; }
+.lt-saida { gap:10px; }
+.lt-esq > label + #tempoTxt { margin-left:-12px; }     /* Duração e frame ficam juntos */
+#btnMini { margin-left:-14px; }
+.lt-mola { flex:1; margin:0 -13px; }                  /* empurra o que vem depois para a ponta (sem somar espaço) */
+.lt-icone { padding:6px 8px; min-width:30px; }
+.lt-play { background:#1f7cff; color:#fff; min-width:38px; font-weight:600; }
+.lt-play:hover:not(:disabled) { background:#3d8fff; }
+#btnLoop { color:var(--apagado); display:inline-flex; align-items:center; justify-content:center; }
+#btnLoop.ativo { background:#123a22; color:#3dff8a; box-shadow:0 0 0 1px #2bd46f inset; }
+.lt-apagar { color:#ff5c6c; }
 #tempoTxt { min-width:118px; font-variant-numeric:tabular-nums; color:var(--ciano); }
+#videoStatus { max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #videoStatus a { color:var(--ciano); }
-#btnMini { margin-left:auto; }
+/* SEMPRE uma linha só. Em telas menores, primeiro aperta os espaços, depois os botões ficam só com o ícone
+   (o nome continua no "title", ao passar o mouse); numa tela bem estreita a barra rola para os lados. */
+.lt-lado, .lt-centro, .lt-grupo { flex-wrap:nowrap; white-space:nowrap; }
+@media (max-width: 1700px) {
+  #linhaTempo, .lt-lado { gap:14px; }
+  .lt-mola { margin:0 -7px; }
+  .lt-esq > label + #tempoTxt { margin-left:-6px; }
+  #btnMini { margin-left:-8px; }
+  .lt-saida { gap:6px; }
+}
+@media (max-width: 1500px) {
+  .lt-txt, #curvaNome { display:none; }
+  #tempoTxt { min-width:0; }
+}
+@media (max-width: 1060px) {
+  body.animando #linhaTempo { display:flex; overflow-x:auto; }
+  .lt-mola { display:none; }
+}
 #btnCurva { display:inline-flex; align-items:center; gap:6px; }
 #curvaGraf { display:inline-flex; }
 #curvaNome { color:var(--ciano); }
@@ -285,3 +323,58 @@ svg.graf polyline { fill:none; stroke:currentColor; stroke-width:1.6; stroke-lin
 .trilha button { padding:3px 8px; font-size:12px; }
 #pecaLeia { white-space:pre-wrap; font-size:12.5px; line-height:1.5; color:var(--texto); max-height:330px; overflow:auto; }
 #pecaLeia code { background:#0f0f1c; border-radius:4px; padding:0 4px; color:var(--ciano); font-size:12px; }
+
+/* aba Camadas: modo de mesclagem da camada selecionada */
+#pn-camadas .mescla { display:flex; align-items:center; gap:8px; margin:2px 0 8px; }
+#pn-camadas .mescla select { flex:1; min-width:0; }
+
+/* aba Assets: o quadradinho do granulado */
+.tile.grao { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2'/%3E%3C/filter%3E%3Crect width='60' height='60' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  display:flex; align-items:center; justify-content:center; font:600 12px system-ui; color:#fff; text-shadow:0 1px 2px #000; }
+
+/* arrastando um arquivo do computador por cima de onde dá para soltar */
+.soltar-aqui { outline:2px dashed var(--ciano); outline-offset:-6px; background-color:rgba(61,245,255,.06) !important; }
+
+/* aba Transformar: grade — nome · eixo · caixa · (corrente) · eixo · caixa · ‹ ◇ › · ↺ (caixas todas do mesmo tamanho) */
+.tf { display:flex; flex-direction:column; gap:7px; }
+.tf-linha { display:grid; grid-template-columns:66px 12px 64px 20px 12px 64px 1fr auto; align-items:center; column-gap:3px;
+  font-size:12px; color:var(--apagado); }
+.tf-nome { white-space:nowrap; }
+.tf-eixo { text-align:right; color:var(--apagado); }
+.tf .kfs { justify-self:end; }
+.tf-elo { width:20px; height:22px; padding:0; display:inline-flex; align-items:center; justify-content:center;
+  background:none; color:var(--apagado); }
+.tf-elo.ativo { background:none; color:var(--ciano); }
+.tf-reset { padding:2px 5px; background:none; color:#8a8aa0; font-size:14px; line-height:1; grid-column:8; }
+.tf-reset:hover:not(:disabled) { color:var(--texto); background:#22223a; }
+.tf .kfs button { padding:3px 2px; }
+/* caixa de número com a unidade dentro, em cinza (só visual: o campo guarda só o número) */
+.cx { position:relative; display:inline-block; width:100%; }
+.cx input[type=number] { width:100%; box-sizing:border-box; padding-right:22px; }
+.cx::after { content:attr(data-un); position:absolute; right:7px; top:50%; transform:translateY(-50%);
+  color:#6b6b85; font-size:11px; pointer-events:none; }
+.cx input[type=number]::-webkit-inner-spin-button { display:none; }
+/* título com uma ação à direita (ex.: Esconder) */
+.painel h4.com-acao { display:flex; align-items:center; justify-content:space-between; }
+.tf-esconder { display:inline-flex; align-items:center; gap:6px; text-transform:none; letter-spacing:0; color:var(--apagado);
+  font-weight:400; font-size:12px; cursor:pointer; }
+/* título que recolhe a seção (Atalhos) */
+.painel h4.recolhe { display:flex; align-items:center; justify-content:flex-start; gap:2px; cursor:pointer; }
+.seta-recolhe { background:none; padding:0 4px; color:var(--ciano); font-size:12px; width:18px; }
+.atalhos.recolhido { display:none; }
+
+/* barra de cima em três colunas (o grupo do meio fica no centro exato) e barra rápida centralizada; entre grupos 26px */
+#topo { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:26px; flex-wrap:nowrap; }
+.tp-lado, .tp-centro, .tp-grupo { display:flex; align-items:center; min-width:0; white-space:nowrap; }
+.tp-lado { gap:14px; }
+.tp-centro { gap:26px; }
+.tp-grupo { gap:4px; }
+.tp-esq #arq { flex:1; min-width:120px; max-width:420px; }
+.tp-dir { justify-content:flex-end; }
+.tp-dir #status { overflow:hidden; text-overflow:ellipsis; min-width:0; }
+#rapida { justify-content:center; gap:26px; flex-wrap:nowrap; }
+#rapida .tp-grupo { gap:4px; }
+@media (max-width: 1500px) {
+  #topo, .tp-centro, #rapida { gap:14px; }
+  #rapida .rot { display:none; }
+}

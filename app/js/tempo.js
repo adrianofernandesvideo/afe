@@ -8,6 +8,15 @@ import { pag, entrada, atual, chaveEm, semContinuos, editar, ganchos } from './d
 import { CURVA_PADRAO } from './presets.js';
 
 let ultimoQuadro = 0, fimDoTrecho = null;                   // fimDoTrecho: onde uma prévia para sozinha
+// loop: botão ⟲ da barra (aceso = o play repete; apagado = toca uma vez e para no fim). Guardado no navegador.
+let loop = true, loopDesta = true;                          // loopDesta: vale para o play em andamento
+try { loop = localStorage.getItem('afe:loop') !== '0'; } catch (e) { /* sem armazenamento */ }
+export const emLoop = () => loop;
+export function definirLoop(v = !loop) {
+  loop = v; loopDesta = v;
+  try { localStorage.setItem('afe:loop', v ? '1' : '0'); } catch (e) { /* ok */ }
+  avisar('tempo');
+}
 export const duracao = () => pag()._dur || 5;               // segundos (por página)
 export const totalFrames = () => Math.round(duracao() * FPS);
 export const frameAtual = () => Math.floor(S.tempo * FPS + 0.01);
@@ -24,8 +33,11 @@ export function irPara(t) {
   S.tempo = noFrame(limitar(t, 0, duracao()));
   desenharInstante();
 }
-export function tocar() {
+// inverter = Shift + play: o contrário do botão de loop, só desta vez
+export function tocar(inverter = false) {
   if (S.tocando || !S.lib) return;
+  loopDesta = inverter ? !loop : loop;
+  if (!loopDesta && S.tempo >= duracao() - 0.5 / FPS) S.tempo = 0;   // parado no fim e sem loop: recomeça
   S.tocando = true;
   ultimoQuadro = performance.now();
   requestAnimationFrame(passo);
@@ -43,13 +55,16 @@ export function tocarTrecho(t0, t1) {
   tocar();
   fimDoTrecho = Math.min(t1, duracao());
 }
-export function alternarPlay() { if (S.tocando) pausar(); else tocar(); }
+export function alternarPlay(inverter = false) { if (S.tocando) pausar(); else tocar(inverter); }
 function passo(agora) {
   if (!S.tocando) return;
   S.tempo += (agora - ultimoQuadro) / 1000;
   ultimoQuadro = agora;
   if (fimDoTrecho != null && S.tempo >= fimDoTrecho) { S.tempo = fimDoTrecho; pausar(); return; }
-  if (S.tempo >= duracao()) S.tempo %= duracao();           // loop
+  if (S.tempo >= duracao()) {
+    if (loopDesta) S.tempo %= duracao();                    // loop
+    else { S.tempo = duracao(); desenharInstante(); pausar(); return; }   // uma vez só: para no fim
+  }
   desenharInstante();
   requestAnimationFrame(passo);
 }
@@ -105,8 +120,11 @@ export function pularChave(dir) {
 
 // ── chave de UMA propriedade (botões ‹ ◇ › ao lado dos campos da aba Transformar) ──
 // o elemento principal tem chave dessa propriedade neste frame? / em algum frame?
-export const temChaveDe = (p, c = S.selCaminho, f = frameAtual()) => (entrada(c).kf || []).some((k) => frameDe(k.t) === f && k[p] !== undefined);
-export const temChavesDe = (p, c = S.selCaminho) => (entrada(c).kf || []).some((k) => k[p] !== undefined);
+// p = uma propriedade ('x') ou um grupo delas ('x,y': a linha da Posição, 'sx,sy': a do Esticar)
+const props = (p) => String(p).split(',');
+const temAlguma = (k, p) => props(p).some((q) => k[q] !== undefined);
+export const temChaveDe = (p, c = S.selCaminho, f = frameAtual()) => (entrada(c).kf || []).some((k) => frameDe(k.t) === f && temAlguma(k, p));
+export const temChavesDe = (p, c = S.selCaminho) => (entrada(c).kf || []).some((k) => temAlguma(k, p));
 // ◇ : põe a chave dessa propriedade neste frame (com o valor que está na tela) — ou tira, se já existe.
 // Vale para todos os selecionados; o principal decide se é pôr ou tirar.
 export function alternarChaveDe(p) {
@@ -116,15 +134,16 @@ export function alternarChaveDe(p) {
   return editar(() => {
     for (const c of S.selPaths) {
       if (!achar(c)) continue;
-      if (tirar) { const k = (entrada(c).kf || []).find((x) => frameDe(x.t) === f); if (k) delete k[p]; continue; }
-      const v = atual(p, c);                                // (lido antes de criar a chave)
-      chaveEm(entrada(c, true), S.tempo)[p] = v;
+      if (tirar) { const k = (entrada(c).kf || []).find((x) => frameDe(x.t) === f); if (k) for (const q of props(p)) delete k[q]; continue; }
+      const vs = props(p).map((q) => atual(q, c));          // (lidos antes de criar a chave)
+      const k = chaveEm(entrada(c, true), S.tempo);
+      props(p).forEach((q, i) => { k[q] = vs[i]; });
     }
   }, { reaplicar: tirar });
 }
 // ‹ › : pula para a chave anterior/próxima que tem essa propriedade (no elemento principal)
 export function pularChaveDe(p, dir) {
-  const fs = (entrada().kf || []).filter((k) => k[p] !== undefined).map((k) => frameDe(k.t)).sort((a, b) => a - b), f = frameAtual();
+  const fs = (entrada().kf || []).filter((k) => temAlguma(k, p)).map((k) => frameDe(k.t)).sort((a, b) => a - b), f = frameAtual();
   const alvo = dir > 0 ? fs.find((x) => x > f) : fs.reverse().find((x) => x < f);
   if (alvo != null) { pausar(); irPara(alvo / FPS); }
 }

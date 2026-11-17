@@ -3,10 +3,12 @@
 //   e.raio   arredondamento — número (px) ou texto com % (ex.: "50%" = círculo). Só quando o usuário mexe nele.
 //   e.forma  o estado dos controles { fill, stroke, orig }   (para reabrir a aba como estava)
 //   e.bg / e.bd   o resultado em CSS (background e border), que a arte aplica.
+// Item ★ granulado: no lugar disso, a aba mostra os ajustes do grão (força, tamanho, cor, animado), guardados
+// no próprio item (P._novos[i].gr).
 // Contorno em gradiente: borda transparente + 2 fundos (o preenchimento só até a borda — "padding-box" —
 // e o gradiente por baixo de tudo — "border-box"). Funciona com cantos arredondados.
 import { S, $, r1, ouvir, soDe } from './base.js';
-import { entrada, mudar } from './doc.js';
+import { entrada, mudar, pag, editar } from './doc.js';
 import { visivel } from './paineis.js';
 import { lerCor, corCss } from './css-valores.js';
 
@@ -72,7 +74,24 @@ function htmlCores(grupo, g) {
   return cor('Cor', 'c1', 'a1') + (g.modo !== 'gradiente' ? '' : cor('Cor 2', 'c2', 'a2') +
     `<div class="ajuste">Ângulo<input type="range" data-g="${grupo}" data-k="ang" data-padrao="135" min="0" max="360" value="${g.ang}"><output>${g.ang}°</output></div>`);
 }
+// o item ★ granulado selecionado (ou null)
+const graoSel = () => (/^#[^/]+$/.test(S.selCaminho || '')
+  ? (pag()._novos || []).find((n) => n.id === S.selCaminho.slice(1) && n.tipo === 'granulado') || null : null);
+function desenharGrao(it) {
+  const g = { int: 0.5, tam: 1, cor: false, anim: true, ...(it.gr || {}) };
+  const op = (v, n, atual) => `<option value="${v}" ${String(v) === String(atual) ? 'selected' : ''}>${n}</option>`;
+  caixa.innerHTML = `
+    <h4>Granulado</h4>
+    <div class="ajuste">Força<input type="range" data-gr="int" min="0" max="100" value="${Math.round(g.int * 100)}"><output>${Math.round(g.int * 100)}%</output></div>
+    <div class="ajuste">Grão<select data-gr="tam">${op(1, 'fino', g.tam)}${op(2, 'médio', g.tam)}${op(3, 'grosso', g.tam)}</select></div>
+    <div class="ajuste">Cor<select data-gr="cor">${op('false', 'preto e branco', g.cor)}${op('true', 'colorido', g.cor)}</select></div>
+    <label class="ajuste"><input type="checkbox" data-gr="anim" ${g.anim ? 'checked' : ''}> Animado (o grão "ferve", como filme)</label>
+    <p class="dica">A mesclagem fica na aba Camadas (o padrão é Sobrepor; Luz suave deixa mais discreto). O tamanho, nas
+      alças. Ele entra travado: o clique na arte passa por ele — selecione pela lista de camadas.</p>`;
+}
 function desenhar() {
+  const grao = S.sel && graoSel();
+  if (grao) { fm = null; visto = chave(estilo()); desenharGrao(grao); return; }
   if (!S.sel) { caixa.innerHTML = '<div class="vazio">Selecione uma caixa, selo, painel ou pílula.</div>'; fm = null; visto = ''; return; }
   fm = ler();
   visto = chave(estilo());
@@ -103,6 +122,15 @@ caixa.addEventListener('dblclick', (ev) => {
   if (!fm || ev.target.type !== 'range' || ev.target.dataset.k !== 'raio') return;
   mudar((e) => { delete e.raio; }, { em: 'principal', lote: 'forma-raio' });
   desenhar();
+});
+// ajustes do granulado
+caixa.addEventListener('input', (ev) => {
+  const t = ev.target, k = t.dataset.gr, it = graoSel();
+  if (!k || !it) return;
+  const v = k === 'int' ? +t.value / 100 : k === 'tam' ? +t.value : k === 'cor' ? t.value === 'true' : t.checked;
+  if (k === 'int') t.nextElementSibling.textContent = t.value + '%';
+  editar((P) => { const x = (P._novos || []).find((n) => n.id === it.id); if (x) x.gr = { ...(x.gr || {}), [k]: v }; },
+    { reaplicar: true, lote: 'grao-' + k, origem: 'forma' });
 });
 caixa.addEventListener('input', (ev) => {
   const t = ev.target, g = t.dataset.g, k = t.dataset.k;

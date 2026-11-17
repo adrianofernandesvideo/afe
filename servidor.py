@@ -22,12 +22,17 @@ O que ele serve:
       POST /api/video    {arquivo, pagina}     gera o MP4 da pagina (roda render_anim.py)
       POST /api/usar-asset {arquivo, biblioteca, asset}   copia uma imagem da biblioteca para a pasta da arte
       POST /api/usar-peca  {arquivo, biblioteca, imagens} copia o CSS da marca (e as imagens da peca) para a arte
+      POST /api/importar {arquivo, destino, nome, dados}  grava uma imagem trazida do computador:
+                           destino "arte"  -> <pasta da arte>/assets/importadas/   (vira camada desta arte)
+                           destino "geral" -> <pasta das artes>/assets-gerais/      (aba Assets de todas as artes)
       GET  /api/video-status?id=...        andamento do video
 
 Seguranca (de proposito, bem fechado):
   * so atende 127.0.0.1 e confere Host/Origin (outra pagina aberta no navegador nao consegue mandar pedidos);
-  * so grava duas coisas, sempre dentro da PASTA_DAS_ARTES:
+  * so grava tres coisas, sempre dentro da PASTA_DAS_ARTES:
       - o arquivo de edicoes que a propria arte declara (<script src="....edicoes.js">);
+      - imagens trazidas do computador (so PNG, JPG, WebP, GIF, AVIF, conferidas pelo conteudo), em
+        <pasta da arte>/assets/importadas/ ou em assets-gerais/;
       - copias de IMAGENS e de arquivos .css de uma biblioteca (--biblioteca), em
         <pasta da arte>/assets/biblioteca/...
         (nunca apaga nem troca um arquivo que ja exista com outro conteudo);
@@ -37,6 +42,8 @@ Seguranca (de proposito, bem fechado):
 Nao instala nada e nao acessa a internet.
 """
 import argparse
+import base64
+import binascii
 import datetime
 import hashlib
 import http.server
@@ -59,7 +66,7 @@ for _fluxo in (sys.stdout, sys.stderr):
     except Exception:  # noqa: BLE001
         pass
 
-VERSAO = "2.3"                         # (no executavel dos releases vira a versao completa, ex.: 2.3.4-beta)
+VERSAO = "2.4"                         # (no executavel dos releases vira a versao completa, ex.: 2.3.4-beta)
 # CONGELADO = rodando como executavel (AFE.exe, feito pelo PyInstaller nos releases do GitHub). Ai os arquivos
 # do editor (app/, arte/, render_anim.py) vem de dentro do executavel, e as artes ficam ao lado dele.
 CONGELADO = bool(getattr(sys, "frozen", False))
@@ -72,10 +79,16 @@ IMAGENS = {".png", ".webp", ".jpg", ".jpeg", ".svg", ".gif", ".avif"}
 # pastas que nao guardam artes nem assets de arte (o nome e comparado em minusculas; pastas que comecam
 # com "." tambem ficam de fora). "placeholders" = imagens provisorias de modelo: nao sao para usar numa
 # arte de verdade. Seu projeto tem outra pasta de renders ou de codigo? Acrescente o nome aqui.
-PULAR = {"out", "build", "node_modules", "__pycache__", "fonts", "placeholders"}
+PULAR = {"out", "build", "node_modules", "__pycache__", "fonts", "placeholders", "assets-gerais"}
 # Bibliotecas de assets: pastas de imagens (ex.: os assets da marca) que aparecem na aba Assets de todas as
 # artes. Lista de {"nome", "pasta" (nome de pasta seguro), "raiz" (Path)}. Vem de --biblioteca.
 BIBLIOTECAS = []
+# "Assets gerais": imagens trazidas do computador para a aba Assets (valem para todas as artes da pasta). Funciona
+# como uma biblioteca a mais, em <pasta das artes>/assets-gerais/ (a pasta so e criada na primeira imagem).
+GERAIS = "Assets gerais"
+# imagens que podem vir do computador: extensao -> como o arquivo comeca (confere que e mesmo uma imagem)
+IMPORTAVEIS = {".png": [b"\x89PNG"], ".jpg": [b"\xff\xd8\xff"], ".jpeg": [b"\xff\xd8\xff"], ".gif": [b"GIF8"],
+               ".webp": [b"RIFF"], ".avif": [b"ftyp"]}
 LOCAIS = {"localhost", "127.0.0.1", "::1", "[::1]"}
 TAG_EDICOES = re.compile(r"""<script[^>]+src=["']([^"'?#]*edicoes\.js)["']""", re.I)
 VIDEOS = {}                            # id -> {"proc", "linhas", "saida"}
@@ -375,6 +388,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.usar_asset(pedido)
             if self.path == "/api/usar-peca":
                 return self.usar_peca(pedido)
+            if self.path == "/api/importar":
+                return self.importar(pedido)
             return self.responder(404, {"erro": "rota desconhecida"})
         except ValueError as e:
             self.responder(400, {"erro": str(e)})
@@ -454,6 +469,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if destino and RAIZ in destino.parents:
                 imagens[pedida] = rel(copiar_sem_trocar(origem.read_bytes(), destino))
         self.responder(200, {"ok": True, "css": css, "imagens": imagens})
+
+    def importar(self, pedido):
+        """Grava uma imagem trazida do computador (arrastada para o editor). Nunca troca um arquivo que ja exista
+        com outro conteudo (grava ao lado, com sufixo)."""
+        arte = arte_de(pedido.get("arquivo"))
+        if not arte:
+            return self.responder(404, {"erro": "arte nao encontrada"})
+        nome = Path(str(pedido.get("nome") or "imagem")).name
+        ext = Path(nome).suffix.lower()
+        if ext not in IMPORTAVEIS:
+            return self.responder(400, {"erro": "so imagens PNG, JPG, WebP, GIF ou AVIF"})
+        try:
+            dados = base64.b64decode(str(pedido.get("dados") or ""), validate=True)
+        except (ValueError, binascii.Error):
+            return self.responder(400, {"erro": "imagem invalida"})
+        cabeca = dados[:16]
+        if not dados or not any(cabeca.startswith(m) if m != b"ftyp" else m in cabeca for m in IMPORTAVEIS[ext]):
+            return self.responder(400, {"erro": "o arquivo nao parece uma imagem " + ext})
+        base = re.sub(r"[^\w.-]+", "-", Path(nome).stem).strip("-.")[:60] or "imagem"
+        if pedido.get("destino") == "geral":
+            bib = biblioteca_de(GERAIS)
+            destino = copiar_sem_trocar(dados, bib["raiz"] / (base + ext))
+            return self.responder(200, {"ok": True, "biblioteca": GERAIS, "asset": destino.relative_to(bib["raiz"]).as_posix()})
+        destino = copiar_sem_trocar(dados, arte.parent / "assets" / "importadas" / (base + ext))
+        self.responder(200, {"ok": True, "src": destino.relative_to(arte.parent).as_posix()})
 
     def video(self, pedido):
         arte = arte_de(pedido.get("arquivo"))
@@ -560,6 +600,8 @@ def main():
         nome = nome.strip() or (raiz.parent.name if raiz.name.lower() == "assets" else raiz.name)
         BIBLIOTECAS.append({"nome": nome, "pasta": re.sub(r"[^\w.-]+", "-", nome).strip("-") or "biblioteca", "raiz": raiz,
                             "ds": ds_de(raiz)})
+    if not any(b["nome"] == GERAIS for b in BIBLIOTECAS):
+        BIBLIOTECAS.append({"nome": GERAIS, "pasta": "assets-gerais", "raiz": RAIZ / "assets-gerais", "ds": None})
     if not (APP / "index.html").is_file():
         sys.exit(f"Nao achei a tela do editor em {APP} (a pasta do editor esta completa?)")
     # porta ocupada (outro AFE aberto?): sem --porta, tenta as seguintes

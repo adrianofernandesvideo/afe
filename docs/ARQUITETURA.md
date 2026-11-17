@@ -48,7 +48,9 @@ window.EDICOES = {
       { "id": "n4", "tipo": "img", "src": "assets/x.webp", "fundo": true, "escondeu": ["0"] },  // imagem de fundo
       { "id": "n5", "tipo": "html", "nome": "Badge", "html": "<span class=…>Novo</span>",       // peça em código
         "css": ["assets/biblioteca/Marca/css/tokens.css"], "contexto": { "fontFamily": "…", "color": "…" },
-        "estilo": ".row{display:flex}", "w": 420, "left": 0, "top": 0 }
+        "estilo": ".row{display:flex}", "w": 420, "left": 0, "top": 0 },
+      { "id": "n6", "tipo": "granulado", "w": 1080, "h": 1350, "left": 0, "top": 0,              // grão de filme
+        "gr": { "int": 0.5, "tam": 1, "cor": false, "anim": true } }   // força 0–1 · 1/2/3 px · colorido · "ferve"
     ],
     "5/0": {                            // edições de UMA camada, pela posição dela (ver "caminho")
       "sig": "h2.titulo",               // tag.classe: confere se ainda é o mesmo elemento
@@ -59,6 +61,8 @@ window.EDICOES = {
       "trava": true,                    // camada travada no editor (o clique passa por ela); a arte ignora
       "html": "texto novo",             // texto (innerHTML)
       "filtro": "…", "tsombra": "…", "csombra": "…", "cor": "…",   // filter / text-shadow / box-shadow / color
+      "mix": "multiply",                // modo de mesclagem (blend mode) → mix-blend-mode; sem = normal
+      "apagado": true,                  // apagado no editor: some da arte (display:none) e da lista de camadas
       "raio": 24,                       // cantos: número = px, texto = "50%"
       "bg": "…", "bd": "…",             // background / border prontos em CSS
       "forma": { "fill": {…}, "stroke": {…}, "orig": {…} },        // estado dos controles da aba Forma
@@ -153,7 +157,13 @@ que entra em `_novos[].src`. Assim o arquivo de edições nunca aponta para fora
 `components/<Nome>/preview.html` (a peça montada; no começo pode vir
 `<!-- @dsCard group="Elementos" width=1080 height=240 -->`), `components/<Nome>/README.md` (como usar) e os
 `.css` da marca na raiz e em `components/`. `GET /api/pecas` lista; `GET /ds/<biblioteca>/...` entrega os
-arquivos (a prévia sai com `<base>` e os `<link>` do CSS já postos); `POST /api/usar-peca` copia para a arte
+arquivos (a prévia sai com `<base>` e os `<link>` do CSS já postos); **Imagens do computador:** `POST /api/importar {arquivo, destino, nome, dados(base64)}` grava em
+`<pasta da arte>/assets/importadas/` (destino `arte`) ou em `<raiz>/assets-gerais/` (destino `geral`). Só PNG, JPG,
+WebP, GIF e AVIF, conferidos pelos primeiros bytes; o nome é limpo (sem pastas) e nada é trocado. `assets-gerais`
+é registrada como uma biblioteca a mais (**Assets gerais**), então a cópia para a arte usa o `/api/usar-asset`
+de sempre; e está em `PULAR` (não aparece de novo como imagens da pasta da arte).
+
+`POST /api/usar-peca` copia para a arte
 o CSS (sem `@import` de endereços da internet) e as imagens pedidas. A prévia roda na mesma origem do
 editor (como a arte): só aponte `--biblioteca` para pastas em que você confia.
 
@@ -196,6 +206,8 @@ Tudo em `app/js/`. Cada arquivo começa com um comentário dizendo o que faz. De
 | `painel-pecas.js` | peças em código do design system: lista na aba Assets, janela "Escolher peça", inserção |
 | `folha.js` | folha de keyframes: desenho, chaves marcadas, barra da camada, arrastos, menu do botão direito |
 | `barra-topo.js` · `barra-tempo.js` · `campos.js` · `atalhos.js` | ligações com a tela. `atalhos.js` = tabela `COMANDOS` (tecla padrão, quando vale, o que faz) |
+| `lista-atalhos.js` | a lista "Atalhos" da aba Transformar (um por linha), com as teclas lidas das preferências |
+| `importar.js` | imagens trazidas do computador (soltar na arte → `assets/importadas/`; na aba Assets → Assets gerais) |
 | `config.js` · `painel-config.js` | preferências de quem usa (tecla de cada comando, papel de Shift/Alt/Ctrl), guardadas no `localStorage` · a tela ⚙ |
 | `main.js` | entrada: importa tudo, expõe `window.ED` (depuração/testes), abre a arte |
 

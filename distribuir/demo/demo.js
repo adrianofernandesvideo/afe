@@ -41,7 +41,7 @@
     el.innerHTML = `<button type="button" title="sobre a demo online">DEMO ONLINE · beta</button>
       <div class="afe-demo-caixa">${problema ? `<p><b>⚠</b> ${problema}</p>` : `
         <p>Esta é a <b>demo online</b> do AFE. Edite à vontade: ao salvar, as edições ficam <b>só neste navegador</b>
-        (nada é enviado). Gerar vídeo e as bibliotecas de assets só funcionam no AFE instalado.</p>`}
+        (nada é enviado) — inclusive as imagens que você trouxer do computador. Gerar vídeo só funciona no AFE instalado.</p>`}
         <div class="acoes">
           ${problema ? '' : `<button type="button" data-a="baixar">⬇ Baixar minhas edições (.edicoes.js)</button>
           <button type="button" data-a="limpar">↺ Voltar esta arte ao original</button>`}

@@ -13,12 +13,12 @@ How to use the editor day to day. (To open the editor and connect an artwork, se
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ ◧  ◀ 3/20 ▶  [ open artwork ▾ ]  ✎ Editar  🎬 Animar   ↶ ↷  💾 Salvar  status  ◨ │
 ├───────────────┬──────────────────────────────────┬───────────────────────────┤
-│ Camadas│Assets │                                  │ Transformar│Efeitos│Forma│ │
-│               │           THE ARTWORK            │ Animação                  │
-│    (left)     │                                  │         (right)           │
-├───────────────┴──────────────────────────────────┴───────────────────────────┤
+│ Transformar│Efeitos│Forma│                       │ Camadas│Assets             │
+│ Animação                  │     THE ARTWORK      │                           │
+│          (left)           │                      │         (right)           │
+├───────────────────────────┴──────────────────────┴───────────────────────────┤
 │ keyframe sheet (shows up with 🎬 Animar)                                       │
-│ ◂ ▶ ▸ frame 0  Duração  ‹ ◆ Chave › ✕ Chave  Curva ▾  ⧉ Copiar ⎘ Colar  🖼 Capa  Blur  🎞 Gerar vídeo  ▾ │
+│ Duração · frame   ⧉ Copiar ⎘ Colar  ⟲ ◂ ▶ ▸  ‹ ◆ Chave › ✕  Curva ▾   Motion Blur  🖼 Capa  🎞 Gerar vídeo ▾ │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -64,11 +64,11 @@ by itself** when the artwork's file changes on disk.
 | snap to the center | when dragging near the center a pink line appears and the element snaps; **Ctrl** turns it off |
 | align | quick bar: left, center, right, top, middle and bottom of the artwork · Transform tab: **⇔ Centro** / **⇕ Centro** (center) relative to the artwork or the outer block |
 | size | **corner handles** of the box · mouse wheel over the element (Shift: faster) · **Tamanho %** (Size) field |
-| width only / height only | **side handles** of the box · **Largura %** (Width) and **Altura %** (Height) fields |
+| width only / height only | **side handles** of the box · the **Esticar %** (stretch) row, **L** (width) and **A** (height) — with the 🔗 chain on (default), changing one changes the other in proportion; click the chain to unlink |
 | rotate | the **dot** above the box (Shift: in 15° steps) · **Girar °** (Rotate) field |
 | opacity | **Opacidade %** field |
 | hide | **Esconder** checkbox (or the 👁 in the Layers tab) |
-| go back to how it was | **↺ Original** removes every edit from the selected elements |
+| go back to how it was | **↺** at the end of each row resets just that row (position 0, size 100, rotation 0…) · **↺ Original** removes every edit from the selected elements (asks first; Ctrl+Z undoes) |
 
 **The box handles** (small white squares around the selection):
 - **Corners:** scale evenly; the opposite corner stays put. With **Shift**, width and height are free.
@@ -80,6 +80,13 @@ by itself** when the artwork's file changes on disk.
   size; the sides stretch. On the **artwork's own elements**, the handles stretch the element (like a photo),
   without touching how the art is built. To go back: **↺ Original**, or 100 in Size/Width/Height.
 - The handles apply to the main element. While you edit a text or the animation plays, they disappear.
+
+Units (px, %, °) show in grey **inside** the box: visual only — type just the number. **Esconder** (hide) sits
+in the section title. The **Atalhos** list collapses and opens with the ▸ / ▾ next to its title.
+
+In the tab, each property is one row: **Posição** (position, X and Y side by side), **Tamanho %** (size),
+**Esticar %** (stretch, L 🔗 A), **Girar °** (rotate) and **Opacidade %** (opacity). With 🎬 Animar each row gets
+‹ ◇ › — on the pairs, a single ◇ keys both.
 
 With several elements selected, all of this applies to all of them. In X and Y, the field shows the main
 element's value and all of them move **the same distance**.
@@ -114,6 +121,7 @@ Shows the main element's effects, split into **layers** you can tweak, add (**+ 
   panels).
 - **Cor do texto** (text color).
 - **Image adjustments:** blur, brightness, saturation and contrast.
+- **Blend mode** (*Mesclagem*) lives in the **Camadas** tab and the right-click menu — see below.
 - **Copiar / Colar nos selecionados** (Copy / Paste to selected): copies all of the above from one element and
   applies it to others.
 
@@ -124,25 +132,50 @@ For boxes, badges, panels, pills and added shapes:
 - **Cantos** (corners): rounding (in px; on round shapes, in %).
 - **Preenchimento** (fill) and **Contorno** (outline): *Original* (leave as is), *Nenhum* (none), *Cor*
   (color) or *Gradiente* (two colors and an angle). The gradient outline works with rounded corners.
+- With a **★ granulado** (grain) selected, the tab shows the grain settings (see "Grain" under Assets).
 
-## Camadas (Layers, left)
+## Camadas (Layers, right)
 
 Lists everything in the artwork — **the top of the list is in front**.
 
 - **▸** opens the elements inside a block. **👁** shows/hides.
-- **⤒ Frente / ⤓ Trás** change the order. **🗑** deletes items you added (marked with ★).
-- **🎬** next to the name = the layer is animated.
+- **⤒ Frente / ⤓ Trás** change the order. **🗑** (or **Delete**) deletes the selected layer after a confirmation: a ★
+  item leaves the edits; an element of the **artwork** disappears from the artwork and the list (the artwork's code
+  doesn't change). To bring it back: **Ctrl+Z**, the "N apagada(s) · restaurar" notice at the top of the list, or
+  right-click → *Restaurar apagados* (restore deleted).
+- **🎬** next to the name = the layer is animated. **◐** = the layer has a blend mode.
+- **Mesclagem** (blend mode, at the top of the list): the selected layer's blend mode, as in Photoshop — Normal,
+  Darken, Multiply, Color Burn, Lighten, Screen, Color Dodge, Add (*Adição*), Overlay, Soft Light, Hard Light,
+  Difference, Exclusion, Hue, Saturation, Color, Luminosity (names on screen in Portuguese). Also on the
+  **right-click menu** (on the artwork or the list) → *Mesclagem ▸*. Same in the PNG and the video.
+  > A layer blends with what's behind it **inside the same block**. If the outer block is rotated, animated or
+  > has opacity, it only blends with what's inside that block.
 
-## Assets (left)
+## Assets (right)
 
 From top to bottom:
 
 0. **★ Peças** (components; e.g. *★ Brand › Peças › Elementos*) — the code components of the brand's design
    system: badges, panels, titles, lists, the website pill… See "Brand components" below.
-1. **Formas e texto** (shapes and text) — rectangle, circle and text.
+1. **Formas e texto** (shapes and text) — rectangle, circle, text and **Grão** (grain, see below).
 2. **★ Library** (e.g. *★ Brand › Fundos*, *★ Brand › Ícones*) — the brand assets, the same for every artwork,
    organized by the library's folders.
+   **★ Assets gerais** (general assets) is the library of images you brought from your computer into the Assets tab.
 3. **Desta arte ›** (from this artwork) — the images in the artwork's own folder.
+
+**Images from your computer:** drag a file (PNG, JPG, WebP, GIF or AVIF, up to 15 MB) from your computer and drop it:
+- **on the artwork** (or the layer list): the image is copied to `assets/importadas/` in the artwork's folder and
+  becomes a ★ layer where you dropped it;
+- **on the Assets tab**: it goes to **★ Assets gerais** (the `assets-gerais/` folder inside the artworks folder)
+  and shows up for **every artwork**; when used in an artwork, it's copied into that artwork's folder.
+
+An existing file is never replaced: same name with different content is saved alongside with a suffix.
+
+**Grain (*Grão* / granulado):** film grain generated by AFE itself, no texture image needed. It covers the whole
+artwork, comes in **locked** (clicks on the artwork go through it — select it from the layer list) and in
+**Overlay**. In the **Forma** tab: *Força* (strength), *Grão* (fine, medium, coarse), *Cor* (black & white or
+color) and *Animado* (the grain "boils", 12 times a second). Animated grain depends only on the time, so the
+video matches the editor. For something subtler, use **Soft Light** or lower the opacity.
 
 **Drag** onto the artwork, or **click** to place it in the center. The item is marked with ★ in the layer list
 and can be moved, styled and animated like any other; **Delete** removes it. The search field filters by file
@@ -323,7 +356,11 @@ layer is invisible — in the preview and in the video.
 **🎞 Gerar vídeo** (render video): saves and renders the page's MP4 (artwork size, 30 fps), showing the
 progress; the link appears next to the button. The artwork's PNG shows the **cover** (see above).
 
-**Blur (motion blur):** the selector next to 🎞 Gerar vídeo gives the **video** a motion trail, like a camera:
+**Play and loop:** ▶ plays the animation. The **⟲** button (next to ◂) turns the **loop** on/off: lit
+(default), play repeats; off, it plays once and stops at the end. **Shift + ▶** (or Shift + Space) does the
+opposite of the button, just that once. The choice is remembered by the browser.
+
+**Motion Blur:** the selector next to 🖼 Capa gives the **video** a motion trail, like a camera:
 *sem* (none), *leve* (light), *normal* (the cinema standard) or *forte* (strong). Set per page. The preview in
 the editor and the PNG stay unblurred. The video takes longer to render: ~4× on light, ~8× on normal, ~12× on
 strong. It only shows on things that move fast; whatever stands still stays sharp.
@@ -383,6 +420,7 @@ don't change anything in the artworks.
 | ] · [ | bring forward · send backward ⚙ |
 | K (with 🎬 Animar) | record ◆ Chave (key) ⚙ |
 | Space (with 🎬 Animar) | play / pause |
+| Shift + Space / Shift + ▶ | play the opposite of the loop setting, just this once ⚙ |
 | `,` and `.` (with 🎬 Animar) | previous / next frame |
 
 ## Good to know

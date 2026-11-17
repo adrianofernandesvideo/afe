@@ -32,12 +32,15 @@
  *       "_novos": [ {id, tipo:"img"|"texto"|"retangulo"|"circulo", left, top, w, h, src, html, fs, fundo} ],
  *                    (img com fundo:true = imagem de FUNDO: cobre a arte toda e fica atras de tudo)
  *                    (tipo:"html" = PECA em codigo: {html, css:[arquivos .css da arte], estilo, contexto, nome, w})
- *       "<caminho>": { sig, x, y, s, sx, sy, r, o, oculto, z, html, filtro, tsombra, csombra, cor, ini, fim,
+ *                    (tipo:"granulado" = GRAO/ruido: {w, h, gr:{int, tam, cor, anim}} — ver "granulado" abaixo)
+ *       "<caminho>": { sig, x, y, s, sx, sy, r, o, oculto, z, html, filtro, tsombra, csombra, cor, ini, fim, mix, apagado,
  *                      raio, bg, bd, forma, kf:[{t, ease, ...}], anim:[{tipo, int, vel}],
  *                      ent:{tipo, dur, int} } } }
  *   kf[i].ease = curva do trecho que vai desta chave ate a proxima (ver CURVAS; sem "ease" = suave).
  *   ini / fim  = tempo da camada, em segundos: ela so aparece de "ini" ate "fim" (sem ini = desde o
  *                comeco; sem fim = ate o final). As chaves (kf) continuam em tempo absoluto.
+ *   apagado    = true: o elemento some da arte (display:none). O codigo da arte nao muda; tirar o campo traz de volta.
+ *   mix        = modo de mesclagem (blend mode do CSS: multiply, screen, overlay...; sem = normal).
  *   ent        = efeito de entrada: comeca em "ini" e dura "dur" segundos (ver a funcao "entrada").
  *   caminho = posicao do elemento dentro da raiz ("4/1" = 2o filho do 5o filho); itens novos usam
  *   "#id". "sig" (tag.classe) confere se o elemento ainda e o mesmo: se a estrutura da arte mudar,
@@ -49,11 +52,13 @@
  */
 (function () {
   'use strict';
-  const VERSAO = 2.8;                        // 2 = formato · .1 curvas · .2 tempo da camada · .3 entrada e capa · .4 imagem de fundo
+  const VERSAO = 2.91;                       // 2 = formato · .1 curvas · .2 tempo da camada · .3 entrada e capa · .4 imagem de fundo
                                              //   .5 mover/aumentar/girar tambem em texto "em linha" (<span>, <em>...)
                                              //   .6 esticar so na largura (sx) ou so na altura (sy)
                                              //   .7 pecas em codigo (item novo de tipo "html", com o CSS da marca)
                                              //   .8 mais efeitos continuos (balancar, orbita, quique, coracao, glitch RGB, estrobo)
+                                             //   .9 modo de mesclagem (mix) e granulado (item novo de tipo "granulado")
+                                             //   .91 apagar um elemento da arte (apagado)
   const EU = document.currentScript;
   const AUTO = !!(EU && EU.hasAttribute('data-auto'));
   const tocados = new Set();                 // elementos em que o editor mexeu (para poder voltar atras)
@@ -115,7 +120,7 @@
   }
 
   // ───────────────────────── estilos: por e tirar sem estragar o que a arte tinha ─────────────────────────
-  const SIMPLES = ['translate', 'scale', 'rotate', 'opacity', 'visibility', 'zIndex', 'filter', 'textShadow', 'boxShadow', 'color', 'display'];
+  const SIMPLES = ['translate', 'scale', 'rotate', 'opacity', 'visibility', 'zIndex', 'filter', 'textShadow', 'boxShadow', 'color', 'display', 'mixBlendMode'];
   // "Atalhos" do CSS mexem em varias declaracoes de uma vez: para devolver o original e preciso guardar todas.
   const FAMILIAS = {
     background:   { css: 'background',    de: (n) => n.startsWith('background-') },
@@ -168,7 +173,7 @@
     // escala final de cada eixo: tamanho (s) vezes o esticado da largura (sx) / da altura (sy)
     const ex = (e.s ?? 1) * (e.sx ?? 1), ey = (e.s ?? 1) * (e.sy ?? 1);
     const mexe = e.x || e.y || ex !== 1 || ey !== 1 || e.r || e.ent || (e.kf && e.kf.length) || (e.anim && e.anim.length);
-    por(el, 'display', o.emLinha && mexe ? 'inline-block' : null);
+    por(el, 'display', e.apagado ? 'none' : o.emLinha && mexe ? 'inline-block' : null);
     por(el, 'translate', (e.x || e.y) ? `${e.x || 0}px ${e.y || 0}px` : null);
     por(el, 'scale', ex === 1 && ey === 1 ? null : ex === ey ? String(ex) : `${ex} ${ey}`);
     por(el, 'rotate', e.r ? `${e.r}deg` : null);
@@ -182,6 +187,7 @@
     por(el, 'borderRadius', e.raio == null ? null : typeof e.raio === 'number' ? e.raio + 'px' : String(e.raio));
     por(el, 'background', e.bg);
     por(el, 'border', e.bd);
+    por(el, 'mixBlendMode', e.mix || null);
   }
 
   // ───────────────────────── textos ─────────────────────────
@@ -285,6 +291,10 @@
           st.textContent = `[data-ed-id="${nv.id || 'n' + (i + 1)}"]{${nv.estilo}}`;
           document.head.append(st);
         }
+      } else if (nv.tipo === 'granulado') {
+        el = document.createElement('div');
+        Object.assign(el.style, { width: (nv.w || 300) + 'px', height: (nv.h || 200) + 'px', backgroundRepeat: 'repeat' });
+        desenharGrao(el, nv.gr || {});
       } else if (nv.tipo === 'texto') {
         el = document.createElement('div');
         el.innerHTML = nv.html || 'Texto';
@@ -297,6 +307,7 @@
       el.className = 'ed-novo';
       el.dataset.edId = nv.id || 'n' + (i + 1);
       if (nv.fundo) el.dataset.edFundo = '1';
+      if (nv.tipo === 'granulado') el.dataset.edGrao = '1';
       Object.assign(el.style, { position: 'absolute', left: (nv.left || 0) + 'px', top: (nv.top || 0) + 'px', zIndex: nv.fundo ? -1 : 5 });
       r.append(el);
     });
@@ -312,6 +323,52 @@
       if (!r.getAttribute('style')) r.removeAttribute('style');
     }
     return Promise.all(espera);
+  }
+
+  // ───────────────────────── granulado (grao de filme) ─────────────────────────
+  // Um quadrado de ruido (LADO x LADO px) gerado aqui mesmo e repetido pela camada: leve em qualquer tamanho.
+  //   gr.int   forca do grao, 0 a 1 (padrao .5)      gr.tam  tamanho do grao: 1, 2 ou 3 px (padrao 1)
+  //   gr.cor   true = grao colorido (padrao: preto e branco)
+  //   gr.anim  true = o grao "ferve": troca de lugar 12 vezes por segundo. A posicao depende so do instante
+  //            (nao de sorteio), entao o video sai igual ao editor e gerar de novo da o mesmo resultado.
+  const LADO = 256, GRAOS = new Map();
+  function sorteador(semente) {               // numeros "aleatorios" sempre iguais para a mesma semente
+    let a = semente >>> 0;
+    return () => { a = (a + 0x6D2B79F5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t ^= t + Math.imul(t ^ (t >>> 7), 61 | t); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  function ladrilho(gr) {
+    const tam = [1, 2, 3].includes(gr.tam) ? gr.tam : 1, int = Math.max(0, Math.min(1, gr.int ?? 0.5)), cor = !!gr.cor;
+    const chave = tam + '|' + int + '|' + cor;
+    if (!GRAOS.has(chave)) {
+      const n = Math.round(LADO / tam), cv = document.createElement('canvas');
+      cv.width = cv.height = n;
+      const cx = cv.getContext('2d'), img = cx.createImageData(n, n), sorte = sorteador(7919);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = sorte() * 255;
+        img.data[i] = v; img.data[i + 1] = cor ? sorte() * 255 : v; img.data[i + 2] = cor ? sorte() * 255 : v;
+        img.data[i + 3] = int * 255;
+      }
+      cx.putImageData(img, 0, 0);
+      GRAOS.set(chave, cv.toDataURL('image/png'));
+    }
+    return { url: GRAOS.get(chave), tam };
+  }
+  function desenharGrao(el, gr) {
+    const { url, tam } = ladrilho(gr);
+    el.style.backgroundImage = `url("${url}")`;
+    el.style.backgroundSize = LADO + 'px ' + LADO + 'px';
+    el.style.imageRendering = tam > 1 ? 'pixelated' : '';
+    el.style.backgroundPosition = '0px 0px';
+  }
+  const temGraoAnimado = (n, ed) => (pag(n, ed)._novos || []).some((nv) => nv.tipo === 'granulado' && nv.gr && nv.gr.anim);
+  function ferverGrao(n, t, ed) {             // o grao animado no instante t
+    for (const nv of pag(n, ed)._novos || []) {
+      if (nv.tipo !== 'granulado' || !nv.gr || !nv.gr.anim) continue;
+      const el = raiz().querySelector(`[data-ed-id="${nv.id}"]`);
+      if (!el) continue;
+      const s = sorteador(Math.floor(t * 12 + 1e-6) * 2654435761 + 1);
+      el.style.backgroundPosition = `${Math.floor(s() * LADO)}px ${Math.floor(s() * LADO)}px`;
+    }
   }
 
   // ───────────────────────── aplicar as edicoes da pagina ─────────────────────────
@@ -492,7 +549,7 @@
     return v;
   }
   const animadoE = (e) => !!e && ((e.kf && e.kf.length > 0) || (e.anim && e.anim.length > 0) || temJanela(e) || !!e.ent);
-  const animado = (n, ed) => Object.entries(pag(n, ed)).some(([c, e]) => c[0] !== '_' && animadoE(e));
+  const animado = (n, ed) => temGraoAnimado(n, ed) || Object.entries(pag(n, ed)).some(([c, e]) => c[0] !== '_' && animadoE(e));
   // desenha o instante t da pagina n
   function quadro(n, t, ed) {
     const vistos = new Set();
@@ -515,6 +572,7 @@
       o.postos.clear(); o.base = null;
       limparAtributo(el, o);
     }
+    ferverGrao(n, t, ed);
   }
 
   // ───────────────────────── para a arte chamar ─────────────────────────

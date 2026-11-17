@@ -13,7 +13,7 @@ Editor visual para artes feitas em HTML — posts, carrosséis, stories, banners
 navegador e ajusta **com o mouse**, sem mexer no código: mover, mudar tamanho e texto, glows e sombras,
 cantos e contornos, acrescentar imagens e formas, animar com keyframes e gerar o vídeo.
 
-![O AFE editando a própria propaganda: a arte no meio, as camadas à esquerda, a animação à direita e a folha de keyframes embaixo](docs/imagens/afe-editor.png)
+![O AFE editando a própria propaganda: a arte no meio, a animação à esquerda, as camadas à direita e a folha de keyframes embaixo](docs/imagens/afe-editor.png)
 
 <p align="center"><img src="docs/imagens/afe-post.gif" width="360" alt="A arte de demonstração animada, exportada pelo próprio AFE"><br><sub>A arte acima, animada no AFE e exportada em vídeo (com motion blur).</sub></p>
 
@@ -23,7 +23,8 @@ cantos e contornos, acrescentar imagens e formas, animar com keyframes e gerar o
 - **Não reescreve a arte:** as mudanças ficam num arquivo de dados ao lado dela (`<arte>.edicoes.js`). Apagar
   esse arquivo devolve a arte ao original.
 - **Efeitos:** glow e sombras em camadas, cor, ajustes de imagem, cantos, preenchimento e contorno em
-  gradiente.
+  gradiente, **modos de mesclagem** (Multiplicação, Tela, Sobrepor…) e **granulado** de filme animado.
+- **Imagens do computador:** arraste e solte em cima da arte (vira camada) ou na aba Assets.
 - **Assets:** formas, texto, imagens, bibliotecas de assets de fora (os da sua marca, por exemplo) e
   **peças em código** de um design system.
 - **Animação:** keyframes com curvas (easing), folha de keyframes, tempo de cada camada, entradas prontas,

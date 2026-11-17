@@ -7,6 +7,11 @@ __pycache__/
 build/
 out/
 exemplo/assets/biblioteca/
+# imagens trazidas do computador ao testar com as artes de demonstracao / de exemplo
+demos/artes/assets/
+demos/artes/assets-gerais/
+exemplo/assets/importadas/
+exemplo/assets-gerais/
 
 # sistema
 .DS_Store
@@ -15,3 +20,6 @@ desktop.ini
 
 # planos e rascunhos privados (nao vao para o GitHub)
 _privado/
+
+# configuracao local do navegador do Claude (nao vai para o GitHub)
+.claude/

@@ -83,7 +83,7 @@ addEventListener('mousemove', (ev) => {
   const dx = P.x + volta.x - a.C0.x, dy = P.y + volta.y - a.C0.y;
 
   const tipo = a.item && a.item.tipo;
-  const forma = tipo === 'retangulo' || tipo === 'circulo';
+  const forma = tipo === 'retangulo' || tipo === 'circulo' || tipo === 'granulado';
   const larguraDaPeca = tipo === 'html' && a.item.w && a.hx && !a.hy;
   if (forma || larguraDaPeca || (proporcional && (tipo === 'img' || tipo === 'texto'))) {   // tamanho REAL do item
     const w = a.w * fx, h = a.h * fy;

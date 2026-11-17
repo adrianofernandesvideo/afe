@@ -7,13 +7,16 @@
 // (clicar dentro da arte tira o foco da tela do editor).
 import { esc } from './base.js';
 
-let aberto = null;
+let aberto = null, posicao = [0, 0];
+// onde o último menu abriu (um submenu, como o da mesclagem, abre no mesmo lugar)
+export const posicaoDoMenu = () => posicao;
 
 export function fecharMenu() {
   if (aberto) { aberto.remove(); aberto = null; }
 }
 export function abrirMenu(x, y, itens, { classe = '', acima = false } = {}) {
   fecharMenu();
+  posicao = [x, y];
   const el = document.createElement('div');
   el.className = 'menu ' + classe;
   el.innerHTML = itens.map((it, i) => (it === '-' ? '<hr>'

@@ -14,7 +14,7 @@ A visual editor for artwork made in HTML — social posts, carousels, stories, b
 browser and adjust it **with the mouse**, without touching its code: move, resize and retype, glows and
 shadows, corners and outlines, add images and shapes, animate with keyframes and render the video.
 
-![AFE editing its own ad: the artwork in the middle, layers on the left, animation on the right and the keyframe sheet at the bottom](docs/imagens/afe-editor.png)
+![AFE editing its own ad: the artwork in the middle, animation on the left, layers on the right and the keyframe sheet at the bottom](docs/imagens/afe-editor.png)
 
 <p align="center"><img src="docs/imagens/afe-post.gif" width="360" alt="The demo artwork, animated and exported by AFE itself"><br><sub>The artwork above, animated in AFE and exported to video (with motion blur).</sub></p>
 
@@ -26,7 +26,9 @@ shadows, corners and outlines, add images and shapes, animate with keyframes and
 - **Edits any fixed-size `.html` artwork** — including art built by a script.
 - **Never rewrites your art:** changes are stored as data in a file next to it (`<art>.edicoes.js`). Delete
   that file and the art is back to the original.
-- **Effects:** layered glows and shadows, color, image adjustments, corners, fills and gradient outlines.
+- **Effects:** layered glows and shadows, color, image adjustments, corners, fills and gradient outlines,
+  **blend modes** (Multiply, Screen, Overlay…) and animated **film grain**.
+- **Images from your computer:** drag and drop onto the artwork (becomes a layer) or into the Assets tab.
 - **Assets:** shapes, text, images, external asset libraries (your brand's, for example) and **code
   components** from a design system.
 - **Animation:** keyframes with easing curves, a keyframe sheet, per-layer timing, ready-made entrances,

@@ -2,6 +2,7 @@
 //   CONTINUOS  efeitos que repetem em loop  (conta: função "continuos" da lib)
 //   CURVAS     easing dos keyframes         (conta: objeto "CURVAS" da lib)
 //   ENTRADAS   efeitos de entrada           (conta: função "entrada" da lib)
+//   MESCLAS    modos de mesclagem (blend modes) — o próprio navegador faz a conta (mix-blend-mode)
 // Para criar um efeito ou uma curva: a conta lá + uma linha aqui. Os menus e a folha de keyframes leem daqui.
 
 // Efeitos contínuos: repetem em loop durante toda a animação.
@@ -54,3 +55,15 @@ export const ENTRADAS = {
 export const GRUPOS_ENTRADA = ['Simples', 'Deslizar', 'Tamanho e giro', 'Com impacto'];
 export const ENTRADA_FRAMES = 30;                            // duração padrão de uma entrada (1 s)
 export const nomeEntrada = (tipo) => (ENTRADAS[tipo] ? ENTRADAS[tipo].nome : tipo);
+
+// Modos de mesclagem (blend modes), na ordem e com os nomes do Photoshop. valor = o do CSS (mix-blend-mode).
+// '-' separa os grupos no menu. "Adição" = plus-lighter (o Linear Dodge do Photoshop).
+export const MESCLAS = [
+  ['normal', 'Normal'], '-',
+  ['darken', 'Escurecer'], ['multiply', 'Multiplicação'], ['color-burn', 'Superexposição de cores'], '-',
+  ['lighten', 'Clarear'], ['screen', 'Tela'], ['color-dodge', 'Subexposição de cores'], ['plus-lighter', 'Adição'], '-',
+  ['overlay', 'Sobrepor'], ['soft-light', 'Luz suave'], ['hard-light', 'Luz direta'], '-',
+  ['difference', 'Diferença'], ['exclusion', 'Exclusão'], '-',
+  ['hue', 'Matiz'], ['saturation', 'Saturação'], ['color', 'Cor'], ['luminosity', 'Luminosidade'],
+];
+export const nomeMescla = (v) => (MESCLAS.find((m) => m[0] === (v || 'normal')) || [, 'Normal'])[1];

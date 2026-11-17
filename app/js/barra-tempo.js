@@ -1,11 +1,11 @@
 // barra-tempo.js — a barra de baixo: tocar, frame atual, duração, botões de keyframe (gravar, apagar, pular,
 // curva, copiar, colar), motion blur do vídeo, gerar vídeo, minimizar.
 // (As operações em si ficam em tempo.js; aqui é só a ligação com os botões.)
-import { S, $, esc, frameDe, ouvir } from './base.js';
+import { S, $, esc, frameDe, ouvir, aviso } from './base.js';
 import { api, urlArte } from './api.js';
 import { salvar, pag, editar } from './doc.js';
 import { minimizarTempo, tempoMinimizado } from './paineis.js';
-import { duracao, frameAtual, alternarPlay, passoFrame, pausar, definirDuracao, gravarChave, apagarChave, pularChave,
+import { duracao, frameAtual, alternarPlay, emLoop, definirLoop, passoFrame, pausar, definirDuracao, gravarChave, apagarChave, pularChave,
   curvaDe, definirCurva, copiarChaves, colarChaves, temCopia, capa, definirCapa } from './tempo.js';
 import { chavesAlvo } from './folha.js';
 import { CURVA_PADRAO, nomeCurva } from './presets.js';
@@ -13,6 +13,7 @@ import { grafico, abrirCurvas } from './curvas.js';
 
 function atualizar() {
   $('btnPlay').textContent = S.tocando ? '❚❚' : '▶';
+  $('btnLoop').classList.toggle('ativo', emLoop());
   $('tempoTxt').textContent = `frame ${frameAtual()} · ${S.tempo.toFixed(2)} s`;
   if (document.activeElement !== $('inDur')) $('inDur').value = duracao();
   $('selMb').value = String(pag()._mb || 0);
@@ -36,7 +37,8 @@ function atualizar() {
 }
 ouvir(['tempo', 'doc', 'arte', 'selecao', 'modo', 'chave'], atualizar);
 
-$('btnPlay').onclick = alternarPlay;
+$('btnPlay').onclick = (ev) => alternarPlay(ev.shiftKey);
+$('btnLoop').onclick = () => definirLoop();
 $('btnFrAnt').onclick = () => passoFrame(-1);
 $('btnFrProx').onclick = () => passoFrame(1);
 $('inDur').addEventListener('change', (ev) => definirDuracao(ev.target.value));
@@ -56,6 +58,9 @@ $('btnMini').onclick = () => minimizarTempo();
 $('selMb').addEventListener('change', (ev) => {
   const v = +ev.target.value;
   editar((P) => { if (v) P._mb = v; else delete P._mb; }, { lote: 'mb' });
+  // quanto mais forte, mais fotos por quadro: o vídeo demora mais para gerar (a prévia aqui não muda)
+  const VEZES = { 0.25: 4, 0.5: 8, 1: 12 }, nome = ev.target.selectedOptions[0].textContent;
+  if (v) aviso(`motion blur ${nome}: o vídeo vai demorar ~${VEZES[v]}× mais para gerar (a prévia aqui fica sem blur)`, 'sujo', 6000);
   ev.target.blur();
 });
 

@@ -5,9 +5,9 @@
 O que já existe, as decisões que guiam o projeto e as ideias para depois. Atualize este arquivo quando
 algo daqui ficar pronto (e registre no [CHANGELOG](CHANGELOG.md)).
 
-## Estado atual — versão 2.3 beta (primeira versão pública)
+## Estado atual — versão 2.4 beta
 
-**Pronto e testado** (`python testes/teste_rapido.py --video`: 149 conferências passando):
+**Pronto e testado** (`python testes/teste_rapido.py --video`: 163 conferências passando):
 
 - **Abrir:** qualquer arte `.html` de tamanho fixo, com páginas e atualização automática ao salvar.
 - **Editar:** selecionar (um ou vários), mover (mouse, setas, ímã no centro), tamanho, giro, opacidade,
@@ -21,15 +21,18 @@ algo daqui ficar pronto (e registre no [CHANGELOG](CHANGELOG.md)).
   arrastar na arte: Shift trava o eixo, Alt anda devagar, Ctrl solta o ímã.
 - **Efeitos:** glow e sombras em camadas, cor do texto, ajustes de imagem, copiar/colar efeitos.
 - **Forma:** cantos, preenchimento e contorno em cor ou gradiente.
-- **Camadas:** árvore, esconder, travar, frente/trás, apagar itens acrescentados.
+- **Camadas:** árvore, esconder, travar, frente/trás, apagar itens acrescentados, **mesclagem (blend mode)** no topo
+  da lista e no botão direito.
 - **Assets:** formas, texto, imagens da pasta da arte e **bibliotecas** de fora (`--biblioteca`; a imagem é
-  copiada para a arte ao usar). Pastas `placeholders` ficam de fora. **Usar como fundo.**
+  copiada para a arte ao usar). Pastas `placeholders` ficam de fora. **Usar como fundo.** **Granulado** (grão de
+  filme, animado ou não). **Imagens do computador:** soltar na arte (vira camada) ou na aba Assets (Assets gerais).
 - **Peças em código** de um design system (`components/`): janela "Escolher peça" com prévia e instruções; a
   peça entra na arte como item editável, com o CSS copiado.
 - **Animação:** keyframes (com gravação automática), ‹ ◇ › ao lado dos campos, folha de keyframes em
   frames, curva (easing) por chave com gráfico, copiar/colar e marcar várias chaves, tempo da camada
   (aparece/some, delay) e Escalonar, 10 entradas, 12 efeitos contínuos, frame da capa, duração por página.
-- **Vídeo:** MP4 da página, com motion blur opcional (sem/leve/normal/forte).
+- **Vídeo:** MP4 da página, com motion blur opcional (sem/leve/normal/forte). Play com **loop** (liga/desliga).
+- **Tela:** efeitos à esquerda, camadas à direita; barra de baixo com o play no centro; atalhos em lista.
 - **⚙ Config:** tecla de cada comando e papel de Shift/Alt/Ctrl no mouse, guardados no navegador.
 - Desfazer/refazer (300 passos); salvar guarda a versão anterior.
 - **Distribuição:** release a cada push com executável (Windows, macOS, Linux) e demo online no GitHub Pages.
@@ -60,7 +63,7 @@ algo daqui ficar pronto (e registre no [CHANGELOG](CHANGELOG.md)).
 - Nomear camadas pelo editor (hoje: `data-nome` no código da arte).
 - Esconder os efeitos que não se aplicam ao tipo de elemento selecionado.
 - Copiar/colar efeitos pelo menu do botão direito.
-- Arrastar um arquivo do computador (imagem ou arte) para dentro do editor.
+- Arrastar uma ARTE (.html) do computador para dentro do editor (imagens já dá).
 - Exportar o frame atual como PNG.
 
 **Animação**

@@ -164,12 +164,27 @@ try:
 
     cod, bib = pedir(PORTA, "/api/biblioteca")
     ok("lista a biblioteca de assets (sem a pasta de placeholders)",
-       cod == 200 and bib["bibliotecas"] == [{"nome": "Marca", "pasta": "Marca", "itens": ["Fundos/fundo teste.png"]}], str(bib))
+       cod == 200 and bib["bibliotecas"] == [{"nome": "Marca", "pasta": "Marca", "itens": ["Fundos/fundo teste.png"]},
+                                             {"nome": "Assets gerais", "pasta": "assets-gerais", "itens": []}], str(bib))
     cod, da_arte = pedir(PORTA, "/api/assets?pasta=" + urllib.request.quote("cliente ação"))
     ok("na pasta da arte, a pasta de placeholders tambem nao aparece", cod == 200 and da_arte["itens"] == ["assets/real.png"], str(da_arte))
     ok("entrega a miniatura da biblioteca e recusa o que nao e imagem dela",
        pedir(PORTA, "/bib/Marca/Fundos/fundo%20teste.png")[0] == 200 and pedir(PORTA, "/bib/Marca/..%2F..%2Fservidor.py")[0] == 404
        and pedir(PORTA, "/api/usar-asset", {"arquivo": ARTE, "biblioteca": "Marca", "asset": "../fora.png"})[0] == 404)
+
+    # imagens trazidas do computador (arrastar e soltar): para a arte e para "Assets gerais"
+    PNG1 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    cod, imp = pedir(PORTA, "/api/importar", {"arquivo": ARTE, "destino": "arte", "nome": "../../foto nova.png", "dados": PNG1})
+    ok("imagem do computador vai para assets/importadas da arte (nome limpo, sem sair da pasta)",
+       cod == 200 and imp.get("src") == "assets/importadas/foto-nova.png" and (tmp / "cliente ação" / "assets" / "importadas" / "foto-nova.png").is_file(), str(imp))
+    cod, imp = pedir(PORTA, "/api/importar", {"arquivo": ARTE, "destino": "geral", "nome": "geral.png", "dados": PNG1})
+    ok("imagem solta na aba Assets vai para Assets gerais (vale para todas as artes)",
+       cod == 200 and imp.get("asset") == "geral.png" and pedir(PORTA, "/api/biblioteca")[1]["bibliotecas"][1]["itens"] == ["geral.png"], str(imp))
+    ok("recusa o que nao e imagem (conteudo falso, SVG)",
+       pedir(PORTA, "/api/importar", {"arquivo": ARTE, "destino": "arte", "nome": "x.png", "dados": "bmFvIHNvdSBpbWFnZW0="})[0] == 400
+       and pedir(PORTA, "/api/importar", {"arquivo": ARTE, "destino": "arte", "nome": "x.svg", "dados": "PHN2Zy8+"})[0] == 400)
+    ok("a pasta assets-gerais nao aparece como imagens da pasta da arte",
+       not any("assets-gerais" in x for x in pedir(PORTA, "/api/assets?pasta=")[1]["itens"]))
 
     cod, pcs = pedir(PORTA, "/api/pecas")
     ok("lista as pecas em codigo da biblioteca (grupo, tamanho, resumo, CSS da marca)",
@@ -197,6 +212,8 @@ try:
         pg = nav.new_page(viewport={"width": 1600, "height": 1000})
         pg.set_default_timeout(8000)
         pg.on("pageerror", lambda e: erros_console.append("erro: " + str(e)))
+        dialogos = []                                       # confirmacoes (apagar, voltar ao original...): aceita e anota
+        pg.on("dialog", lambda d: (dialogos.append(d.message), d.accept()))
         pg.on("console", lambda m: erros_console.append("console: " + m.text) if m.type == "error" else None)
         js = pg.evaluate
         arte = pg.frame_locator("#quadro")
@@ -368,9 +385,9 @@ try:
             escondeu = e().get("oculto") is True
             pg.keyboard.press("h"); quieto()
             pg.keyboard.press("2"); quieto()
-            aba2 = js("ED.S.abaDir")
+            aba2 = js("ED.S.abaEsq")
             pg.keyboard.press("1"); quieto()
-            ok("atalhos novos: H esconde/mostra, 1 e 2 trocam de aba", escondeu and "oculto" not in e() and aba2 == "efeitos" and js("ED.S.abaDir") == "transformar")
+            ok("atalhos novos: H esconde/mostra, 1 e 2 trocam de aba", escondeu and "oculto" not in e() and aba2 == "efeitos" and js("ED.S.abaEsq") == "transformar")
             # tela de Config: trocar a tecla de "Esconder / mostrar" para X
             pg.click("#btnConfig"); quieto()
             ok("a tela de Config lista os comandos e as teclas do mouse", pg.locator("#config").is_visible() and pg.locator("#cfgTeclas .cfg-linha").count() >= 25
@@ -431,7 +448,7 @@ try:
 
         def t_efeitos():
             arte.locator(".b1").click(); quieto()
-            pg.click('.abas[data-lado="dir"] [data-aba="efeitos"]'); quieto()
+            pg.click('.abas[data-lado="esq"] [data-aba="efeitos"]'); quieto()
             n = pg.locator('#pn-efeitos .camada[data-parte="filtro"]').count()
             campo = pg.locator('#pn-efeitos .camada[data-parte="filtro"] input[data-k="b"]').first
             campo.fill("80"); quieto()
@@ -454,7 +471,7 @@ try:
 
         def t_forma():
             arte.locator(".painel").click(); quieto()
-            pg.click('.abas[data-lado="dir"] [data-aba="forma"]'); quieto()
+            pg.click('.abas[data-lado="esq"] [data-aba="forma"]'); quieto()
             pg.select_option('#pn-forma select[data-g="stroke"]', "gradiente"); quieto()
             d = e()
             ok("contorno em gradiente (borda transparente + 2 fundos)", d.get("bd", "").endswith("solid transparent") and "border-box" in d.get("bg", "") and "raio" not in d, str({k: d.get(k) for k in ("bd", "bg", "raio")}))
@@ -466,7 +483,7 @@ try:
         tentar("forma", t_forma)
 
         def t_camadas():
-            pg.click('.abas[data-lado="esq"] [data-aba="camadas"]'); quieto()
+            pg.click('.abas[data-lado="dir"] [data-aba="camadas"]'); quieto()
             sel = js("ED.S.selCaminho")
             linha = pg.locator("#pn-camadas .cam", has_text="AFE")
             linha.locator(".olho").click(); quieto()
@@ -476,12 +493,12 @@ try:
         tentar("camadas", t_camadas)
 
         def t_assets():
-            pg.click('.abas[data-lado="esq"] [data-aba="assets"]'); quieto(300)
+            pg.click('.abas[data-lado="dir"] [data-aba="assets"]'); quieto(300)
             pg.click('#listaAssets .tile[data-tipo="retangulo"]'); quieto(200)
             pg.click('#listaAssets .tile[data-tipo="circulo"]'); quieto(200)
             novos = js("ED.doc.pag()._novos.map(n => n.id)")
             ok("clicar num asset cria o item (com id proprio) e seleciona", novos == ["n1", "n2"] and js("ED.S.selCaminho") == "#n2" and arte.locator("[data-ed-id]").count() == 2, str(novos))
-            pg.click('.abas[data-lado="dir"] [data-aba="forma"]'); quieto()
+            pg.click('.abas[data-lado="esq"] [data-aba="forma"]'); quieto()
             pg.select_option('#pn-forma select[data-g="fill"]', "cor"); quieto()
             ok("mexer na Forma do circulo nao estraga o circulo (raio em %)", "raio" not in e() and arte.locator('[data-ed-id="n2"]').evaluate("el => getComputedStyle(el).borderTopLeftRadius") == "50%")
             arte.locator('[data-ed-id="n1"]').click(position={"x": 12, "y": 12}); quieto()
@@ -493,7 +510,7 @@ try:
         tentar("assets", t_assets)
 
         def t_biblioteca():
-            pg.click('.abas[data-lado="esq"] [data-aba="assets"]'); quieto(300)
+            pg.click('.abas[data-lado="dir"] [data-aba="assets"]'); quieto(300)
             tile = pg.locator('#listaAssets .tile[data-bib="Marca"]')
             ok("a biblioteca aparece na aba Assets, junto das imagens da arte", tile.count() == 1
                and pg.locator('#listaAssets .tile[data-src="assets/real.png"]').count() == 1 and pg.locator('#listaAssets .tile[data-src*="rovisorio"]').count() == 0)
@@ -599,7 +616,7 @@ try:
             js("ED.tempo.irPara(0.5)"); quieto()
             y = js("ED.doc.atual('y')")
             ok("no meio do caminho o valor fica entre as duas chaves", -5 < y < 0, str(y))
-            pg.click('.abas[data-lado="dir"] [data-aba="transformar"]'); quieto()
+            pg.click('.abas[data-lado="esq"] [data-aba="transformar"]'); quieto()
             pg.locator("#inOculto").check(); quieto()
             ok("mudar algo que nao anima NAO cria chave vazia", len(e().get("kf", [])) == 2 and e().get("oculto") is True)
             pg.locator("#inOculto").uncheck(); quieto()
@@ -609,7 +626,7 @@ try:
             pg.keyboard.press("Delete"); quieto(200)
             ok("Delete apaga a chave marcada", len(e().get("kf", [])) == 1)
             pg.keyboard.press("Control+z"); quieto(200)
-            pg.click('.abas[data-lado="dir"] [data-aba="animacao"]'); quieto()
+            pg.click('.abas[data-lado="esq"] [data-aba="animacao"]'); quieto()
             pg.select_option("#selPreset", "flutuar"); quieto(300)
             tocando = js("ED.S.tocando")
             pg.keyboard.press(" "); quieto()
@@ -728,11 +745,11 @@ try:
 
         def t_chave_no_campo():
             quadros = lambda: js("(ED.doc.entrada().kf || []).map(k => Math.round(k.t * 30))")  # noqa: E731
-            pg.click('.abas[data-lado="dir"] [data-aba="transformar"]'); quieto()
+            pg.click('.abas[data-lado="esq"] [data-aba="transformar"]'); quieto()
             pg.locator("#folha .fl.el .losango").nth(1).click(); quieto()      # seleciona a bolha (chaves em 0, 30, 60)
             js("ED.tempo.irPara(45 / 30)"); quieto()
             chave = pg.locator('.kfs[data-kf="r"] button[data-d="0"]')
-            ok("com o Animar ligado, cada campo tem os botoes de keyframe", chave.is_visible() and chave.inner_text() == "◇" and pg.locator("#pn-transformar .kfs").count() == 7)
+            ok("com o Animar ligado, cada campo tem os botoes de keyframe", chave.is_visible() and chave.inner_text() == "◇" and pg.locator("#pn-transformar .kfs").count() == 5)
             chave.click(); quieto(200)
             k = [x for x in e()["kf"] if round(x["t"] * 30) == 45]
             ok("◇ poe a chave so daquela propriedade neste frame", k == [{"t": 1.5, "r": 0}] and chave.inner_text() == "◆", str(k))
@@ -742,7 +759,7 @@ try:
             ok("‹ › pulam entre as chaves daquela propriedade", f_ant == "0" and pg.inner_text("#cabecaNum") == "45", f"{f_ant} {pg.inner_text('#cabecaNum')}")
             chave.click(); quieto(200)
             ok("◆ tira a chave (as outras continuam)", quadros() == [0, 30, 60] and chave.inner_text() == "◇", str(quadros()))
-            pg.click('.abas[data-lado="dir"] [data-aba="animacao"]'); quieto()
+            pg.click('.abas[data-lado="esq"] [data-aba="animacao"]'); quieto()
         tentar("keyframe ao lado do campo", t_chave_no_campo)
 
         def t_tempo_camada():
@@ -912,7 +929,7 @@ try:
         def t_fundo():
             abrir("cliente ação/comfundo.html")
             pg.click("#btnEditar"); quieto()
-            pg.click('.abas[data-lado="esq"] [data-aba="assets"]'); quieto(400)
+            pg.click('.abas[data-lado="dir"] [data-aba="assets"]'); quieto(400)
             vis = lambda sel: arte.locator(sel).evaluate("el => getComputedStyle(el).visibility")  # noqa: E731
             pg.locator('#listaAssets .tile[data-bib="Marca"]').hover()
             pg.locator('#listaAssets .tile[data-bib="Marca"] [data-acao="fundo"]').click(); quieto(500)
@@ -935,7 +952,7 @@ try:
 
         def t_em_linha():
             # <p class="linha"><span class="cor">texto em linha</span></p>: o clique pega o <span>, que e texto "em linha"
-            pg.click('.abas[data-lado="esq"] [data-aba="camadas"]'); quieto()
+            pg.click('.abas[data-lado="dir"] [data-aba="camadas"]'); quieto()
             nomes = [n for n in pg.locator("#pn-camadas .cam .nome").all_inner_texts() if "texto em linha" in n]
             ok("embrulho de um texto so aparece como uma camada (nao duas)", len(nomes) == 1 and nomes[0].startswith("cor"), str(nomes))
             arte.locator(".cor").click(); quieto()
@@ -954,6 +971,84 @@ try:
             nomes = [n for n in pg.locator("#pn-camadas .cam .nome").all_inner_texts() if "texto em linha" in n]
             ok("o bloco de fora aparece na lista quando e selecionado", len(nomes) == 2, str(nomes))
         tentar("texto em linha", t_em_linha)
+
+        def t_novidades():
+            abrir(ARTE)
+            # barra de baixo: o play no centro da barra; loop aceso por padrão, desliga e lembra
+            if not js("ED.S.editando"):
+                pg.click("#btnEditar"); quieto()
+            if not js("ED.S.animando"):
+                pg.click("#btnAnimar"); quieto()
+            barra, play = pg.locator("#linhaTempo").bounding_box(), pg.locator("#btnPlay").bounding_box()
+            ok("o play fica no centro da barra de baixo", abs((barra["x"] + barra["width"] / 2) - (play["x"] + play["width"] / 2)) < 60, f"{barra} {play}")
+            ligado = js("document.getElementById('btnLoop').classList.contains('ativo')")
+            pg.click("#btnLoop"); quieto()
+            ok("botao de loop: aceso por padrao, clique desliga e fica lembrado", ligado and not js("ED.tempo.emLoop()")
+               and js("localStorage.getItem('afe:loop')") == "0")
+            pg.click("#btnLoop"); quieto()
+            # lados trocados e atalhos em lista
+            esq, dir_ = pg.locator("#esq").bounding_box(), pg.locator("#dir").bounding_box()
+            ok("efeitos a esquerda, camadas a direita", pg.locator('#esq [data-aba="efeitos"]').count() == 1
+               and pg.locator('#dir [data-aba="camadas"]').count() == 1 and esq["x"] < dir_["x"])
+            ok("atalhos: um por linha", pg.locator("#listaAtalhos .at-linha").count() > 15)
+            # Transformar: pares numa linha; corrente liga largura e altura; ↺ volta ao padrão
+            pg.click('.abas[data-lado="esq"] [data-aba="transformar"]'); quieto()
+            arte.locator(".selo").click(); quieto()
+            pg.fill("#inSX", "150"); pg.press("#inSX", "Enter"); quieto()
+            ligado = (e().get("sx"), e().get("sy"))
+            pg.click("#btnElo"); pg.fill("#inSY", "80"); pg.press("#inSY", "Enter"); quieto(); pg.click("#btnElo"); quieto()
+            solto = (e().get("sx"), e().get("sy"))
+            pg.click('.tf-reset[data-reset="sx,sy"]'); quieto()
+            # apagar um elemento da ARTE: pede confirmacao, some da arte e da lista; "restaurar" traz de volta
+            arte.locator(".selo").click(); quieto()
+            cs = js("ED.S.selCaminho"); n0 = pg.locator("#pn-camadas .cam").count(); dialogos.clear()
+            pg.keyboard.press("Delete"); quieto(300)
+            sumiu = js(f"getComputedStyle(ED.arte.achar({json.dumps(cs)})).display") == "none" and pg.locator("#pn-camadas .cam").count() == n0 - 1
+            pg.click("#pn-camadas .apagados a"); quieto(300)
+            ok("apagar elemento da arte: confirma, some, e 'restaurar' traz de volta",
+               len(dialogos) == 1 and sumiu and js(f"getComputedStyle(ED.arte.achar({json.dumps(cs)})).display") != "none"
+               and pg.locator("#pn-camadas .cam").count() == n0, str(dialogos))
+            ok("Esticar: corrente ligada acompanha, solta nao; reset volta ao padrao",
+               ligado == (1.5, 1.5) and solto == (1.5, 0.8) and "sx" not in e() and "sy" not in e(), f"{ligado} {solto} {e()}")
+            # mesclagem pela aba Camadas e pelo botao direito; Ctrl+Z volta
+            pg.click('.abas[data-lado="dir"] [data-aba="camadas"]'); quieto()
+            arte.locator(".selo").click(); quieto()
+            c = js("ED.S.selCaminho")
+            pg.select_option('#pn-camadas select[data-acao="mescla"]', "multiply"); quieto()
+            css = lambda: js(f"getComputedStyle(ED.arte.achar({json.dumps(c)})).mixBlendMode")  # noqa: E731
+            antes = css()
+            pg.keyboard.press("Control+z"); quieto(200)
+            ok("mesclagem pela aba Camadas aplica na arte e o Ctrl+Z desfaz", e().get("mix") is None and antes == "multiply" and css() == "normal", antes)
+            arte.locator(".selo").click(button="right"); quieto()
+            pg.click(".menu button:has-text('Mesclagem')"); quieto()
+            pg.click(".menu button:has-text('Tela')"); quieto()
+            ok("mesclagem pelo botao direito na arte", e().get("mix") == "screen" and css() == "screen")
+            pg.keyboard.press("Control+z"); quieto(200)
+            # granulado: entra travado, em Sobrepor, cobre a arte; animado e sempre igual no mesmo instante
+            pg.click('.abas[data-lado="dir"] [data-aba="assets"]'); quieto(300)
+            pg.click('.tile[data-tipo="granulado"]'); quieto(400)
+            g = js("ED.S.selCaminho")
+            pos = lambda t: js(f"(ED.tempo.irPara({t}), ED.arte.achar({json.dumps(g)}).style.backgroundPosition)")  # noqa: E731
+            ok("granulado: travado, em Sobrepor, do tamanho da arte, com o grao desenhado",
+               e().get("trava") is True and e().get("mix") == "overlay" and js("ED.arte.nomeDe(ED.S.sel)") == "★ granulado"
+               and js("ED.S.sel.getBoundingClientRect().width") == js("ED.S.larg") and "data:image/png" in js("ED.S.sel.style.backgroundImage"))
+            a, b, a2 = pos(1), pos(1.1), pos(1)
+            ok("granulado animado: muda com o tempo e repete igual no mesmo instante (video = editor)", a != b and a == a2 and js("ED.S.lib.animado(ED.S.pagina, ED.S.edicoes)"), f"{a} {b} {a2}")
+            pg.click('.abas[data-lado="esq"] [data-aba="forma"]'); quieto()
+            pg.select_option('#pn-forma select[data-gr="tam"]', "2"); quieto()
+            ok("ajustes do granulado na aba Forma", js(f"ED.doc.pag()._novos.find(n => '#' + n.id === {json.dumps(g)}).gr.tam") == 2)
+            pg.keyboard.press("Control+z"); quieto(); pg.keyboard.press("Control+z"); quieto()
+            # imagem do computador solta em cima da arte vira camada
+            pg.evaluate("""(png) => {
+              const dt = new DataTransfer(), bin = Uint8Array.from(atob(png), (ch) => ch.charCodeAt(0));
+              dt.items.add(new File([bin], 'solta.png', { type: 'image/png' }));
+              const d = document.getElementById('quadro').contentDocument, el = d.elementFromPoint(100, 100);
+              for (const t of ['dragover', 'drop']) el.dispatchEvent(new DragEvent(t, { dataTransfer: dt, bubbles: true, cancelable: true, clientX: 100, clientY: 100 }));
+            }""", PNG1)
+            pg.wait_for_function("(ED.doc.pag()._novos || []).some((n) => n.src === 'assets/importadas/solta.png')", timeout=8000)
+            ok("imagem do computador solta na arte vira camada (gravada na pasta da arte)", (tmp / "cliente ação" / "assets" / "importadas" / "solta.png").is_file())
+            pg.keyboard.press("Control+z"); quieto()
+        tentar("novidades: barra, loop, lados, atalhos, mesclagem, granulado, importar", t_novidades)
 
         erros_console[:] = [x for x in erros_console if "ERR_NAME_NOT_RESOLVED" not in x]   # (fonte "da internet" da previa da peca: endereco falso no teste)
         ok("nenhum erro no console do navegador", not erros_console, " | ".join(erros_console)[:300])

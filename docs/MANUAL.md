@@ -10,12 +10,12 @@ Como usar o editor no dia a dia. (Para abrir o editor e ligar uma arte, veja o [
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │ ◧  ◀ 3/20 ▶  [ arte aberta ▾ ]   ✎ Editar  🎬 Animar   ↶ ↷  💾 Salvar  status  ◨ │
 ├───────────────┬──────────────────────────────────┬───────────────────────────┤
-│ Camadas│Assets │                                  │ Transformar│Efeitos│Forma│ │
-│               │            A  ARTE               │ Animação                  │
-│  (esquerda)   │                                  │        (direita)          │
-├───────────────┴──────────────────────────────────┴───────────────────────────┤
+│ Transformar│Efeitos│Forma│                       │ Camadas│Assets             │
+│ Animação                  │      A  ARTE         │                           │
+│        (esquerda)         │                      │        (direita)          │
+├───────────────────────────┴──────────────────────┴───────────────────────────┤
 │ folha de keyframes (aparece com 🎬 Animar)                                    │
-│ ◂ ▶ ▸ frame 0  Duração  ‹ ◆ Chave › ✕ Chave  Curva ▾  ⧉ Copiar ⎘ Colar  🖼 Capa  Blur  🎞 Gerar vídeo  ▾ │
+│ Duração · frame   ⧉ Copiar ⎘ Colar  ⟲ ◂ ▶ ▸  ‹ ◆ Chave › ✕  Curva ▾   Motion Blur  🖼 Capa  🎞 Gerar vídeo ▾ │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -57,11 +57,11 @@ Sem o **✎ Editar** ligado, o editor é só um visualizador: mostra a arte enca
 | grudar no centro | ao arrastar perto do centro aparece uma linha rosa e o elemento gruda; **Ctrl** desliga |
 | alinhar | barra rápida: esquerda, centro, direita, topo, meio e base da arte · aba Transformar: **⇔ Centro** / **⇕ Centro** em relação à arte ou ao bloco de fora |
 | tamanho | **alças dos cantos** da caixa · roda do mouse em cima do elemento (Shift: mais rápido) · campo **Tamanho %** |
-| só a largura / só a altura | **alças dos lados** da caixa · campos **Largura %** e **Altura %** |
+| só a largura / só a altura | **alças dos lados** da caixa · linha **Esticar %** (**L** e **A**) — com a corrente 🔗 ligada (padrão), mudar uma muda a outra na mesma proporção; clique na corrente para soltar |
 | girar | **bolinha** em cima da caixa (Shift: de 15 em 15 graus) · campo **Girar °** |
 | opacidade | campo **Opacidade %** |
 | esconder | caixa **Esconder** (ou o 👁 na aba Camadas) |
-| voltar ao que era | **↺ Original** tira todas as edições dos selecionados |
+| voltar ao que era | **↺** no fim de cada linha volta só aquela linha ao padrão (posição 0, tamanho 100, giro 0…) · **↺ Original** tira todas as edições dos selecionados (pede confirmação; Ctrl+Z desfaz) |
 
 **As alças da caixa** (quadradinhos brancos em volta do selecionado):
 - **Cantos:** aumentam ou diminuem por igual; o canto oposto fica parado. Com **Shift**, largura e altura
@@ -75,6 +75,12 @@ Sem o **✎ Editar** ligado, o editor é só um visualizador: mostra a arte enca
   esticam o elemento (como uma foto), sem mexer na montagem da arte. Para voltar: **↺ Original**, ou
   100 em Tamanho/Largura/Altura.
 - As alças valem para o elemento principal. Enquanto você edita um texto ou a animação toca, elas somem.
+
+As unidades (px, %, °) aparecem em cinza **dentro** da caixa: é só visual — digite apenas o número.
+**Esconder** fica no título da seção. A lista **Atalhos** recolhe e abre no ▸ / ▾ ao lado do título.
+
+Na aba, cada propriedade é uma linha: **Posição** (X e Y lado a lado), **Tamanho %**, **Esticar %** (L 🔗 A),
+**Girar °** e **Opacidade %**. Com 🎬 Animar, cada linha ganha ‹ ◇ › — nos pares, um ◇ só grava os dois.
 
 Com vários selecionados, tudo isso vale para todos. Em X e Y, o campo mostra o valor do principal e
 todos andam **a mesma distância**.
@@ -108,6 +114,7 @@ Mostra os efeitos do elemento principal, separados em **camadas** que você pode
 - **Sombra do texto** e **Sombra da caixa** (o brilho em volta de selos, pílulas e painéis).
 - **Cor do texto.**
 - **Ajustes de imagem:** desfoque, brilho, saturação e contraste.
+- **Mesclagem (blend mode)** fica na aba **Camadas** e no botão direito — veja abaixo.
 - **Copiar / Colar nos selecionados:** copia tudo isso de um elemento e aplica igual em outros.
 
 ## Forma (cantos, preenchimento, contorno)
@@ -117,25 +124,49 @@ Para caixas, selos, painéis, pílulas e formas acrescentadas:
 - **Cantos:** arredondamento (em px; em formas redondas, em %).
 - **Preenchimento** e **Contorno:** *Original* (não mexe), *Nenhum*, *Cor* ou *Gradiente* (duas cores e
   ângulo). O contorno em gradiente funciona com cantos arredondados.
+- Com um **★ granulado** selecionado, a aba mostra os ajustes do grão (veja "Granulado" em Assets).
 
-## Camadas (esquerda)
+## Camadas (direita)
 
 Lista tudo o que há na arte — **o de cima da lista fica na frente**.
 
 - **▸** abre os elementos de dentro de um bloco. **👁** mostra/esconde.
-- **⤒ Frente / ⤓ Trás** mudam a ordem. **🗑** apaga itens acrescentados por você (marcados com ★).
-- **🎬** ao lado do nome = a camada tem animação.
+- **⤒ Frente / ⤓ Trás** mudam a ordem. **🗑** (ou **Delete**) apaga a camada selecionada, depois de confirmar: um
+  item ★ sai das edições; um elemento da **arte** some da arte e da lista (o código da arte não muda). Para trazer
+  de volta: **Ctrl+Z**, ou o aviso "N apagada(s) · restaurar" no topo da lista, ou o botão direito → *Restaurar apagados*.
+- **🎬** ao lado do nome = a camada tem animação. **◐** = a camada tem mesclagem.
+- **Mesclagem** (no topo da lista): o *blend mode* da camada selecionada, como no Photoshop — *Normal*,
+  *Escurecer, Multiplicação, Superexposição de cores*, *Clarear, Tela, Subexposição de cores, Adição*,
+  *Sobrepor, Luz suave, Luz direta*, *Diferença, Exclusão*, *Matiz, Saturação, Cor, Luminosidade*. Também no
+  **botão direito** (na arte ou na lista) → *Mesclagem ▸*. Aparece igual no PNG e no vídeo.
+  > A camada mescla com o que está atrás dela **dentro do mesmo bloco**. Se o bloco de fora estiver girado,
+  > animado ou com opacidade, ela mescla só com o que há dentro dele.
 
-## Assets (esquerda)
+## Assets (direita)
 
 De cima para baixo:
 
 0. **★ Peças** (ex.: *★ Marca › Peças › Elementos*) — as peças em código do design system da marca: selos,
    painéis, títulos, listas, pílula do site… Veja "Peças da marca" abaixo.
-1. **Formas e texto** — retângulo, círculo e texto.
+1. **Formas e texto** — retângulo, círculo, texto e **Grão** (granulado, veja abaixo).
 2. **★ Biblioteca** (ex.: *★ Marca › Fundos*, *★ Marca › Ícones*) — os assets da marca, iguais para
    todas as artes, organizados pelas pastas da biblioteca.
+   **★ Assets gerais** é a biblioteca das imagens que você trouxe do computador para a aba Assets.
 3. **Desta arte ›** — as imagens que estão na pasta da própria arte.
+
+**Imagens do computador:** arraste um arquivo (PNG, JPG, WebP, GIF ou AVIF, até 15 MB) do computador e solte:
+- **em cima da arte** (ou da lista de camadas): a imagem é copiada para `assets/importadas/` na pasta da arte
+  e vira uma camada ★ onde você soltou;
+- **na aba Assets**: vai para **★ Assets gerais** (pasta `assets-gerais/` dentro da pasta das artes) e aparece
+  para **todas as artes**; ao usar numa arte, ela é copiada para a pasta dessa arte.
+
+Nunca troca um arquivo que já exista: com o mesmo nome e outro conteúdo, grava ao lado com um sufixo.
+
+**Granulado (Grão):** um grão de filme gerado pelo próprio AFE, sem imagem de textura. Entra cobrindo a arte
+toda, **travado** (o clique na arte passa por ele — selecione pela lista de camadas) e em **Sobrepor**. Na aba
+**Forma**: *Força*, *Grão* (fino, médio, grosso), *Cor* (preto e branco ou colorido) e *Animado* (o grão
+"ferve", 12 vezes por segundo). O grão animado depende só do instante: o vídeo sai igual ao editor. Para mais
+discreto, use **Luz suave** na mesclagem ou baixe a opacidade.
 
 **Arraste** para a arte, ou **clique** para pôr no centro. O item entra marcado com ★ na lista de
 camadas e pode ser movido, estilizado e animado como qualquer outro; **Delete** apaga. O campo de
@@ -185,6 +216,8 @@ busca filtra pelo nome do arquivo.
   Depois de selecionada, dá para mover, aumentar, mudar a opacidade e animar como qualquer item.
 
 ## Animação
+
+**Desfazer / Refazer:** botões **↶ Desfazer** e **↷ Refazer** no centro da barra de cima (ou Ctrl+Z e Ctrl+Shift+Z / Ctrl+Y).
 
 Ligue **🎬 Animar**: aparece a linha do tempo, contada em **frames** (30 por segundo). A cabeça vai para
 o frame 0. Com o Animar desligado, o editor mostra a **capa** (veja abaixo).
@@ -313,10 +346,15 @@ prévia e no vídeo.
 **🎞 Gerar vídeo:** salva e gera o MP4 da página (tamanho da arte, 30 fps), mostrando o andamento; o
 link aparece ao lado do botão. O PNG da arte mostra a **capa** (veja acima).
 
-**Blur (motion blur):** o seletor ao lado de 🎞 Gerar vídeo deixa o **vídeo** com rastro de movimento,
+**Tocar e loop:** ▶ toca a animação. O botão **⟲** (ao lado do ◂) liga/desliga o **loop**: aceso (padrão), o
+play repete; apagado, toca uma vez e para no fim. **Shift + ▶** (ou Shift + Espaço) faz o contrário do botão,
+só daquela vez. A escolha fica guardada no navegador.
+
+**Motion Blur:** o seletor ao lado de 🖼 Capa deixa o **vídeo** com rastro de movimento,
 como numa câmera: *sem*, *leve*, *normal* (o padrão do cinema) ou *forte*. Vale por página. A prévia aqui
 no editor e o PNG ficam sem blur. O vídeo demora mais para sair: ~4× no leve, ~8× no normal, ~12× no forte.
-Só aparece em quem se move rápido; o que está parado fica nítido.
+Só aparece em quem se move rápido; o que está parado fica nítido. Ao escolher um blur, o editor avisa quantas vezes
+mais o vídeo vai demorar.
 
 ## Salvar, desfazer, refazer
 
@@ -373,6 +411,7 @@ não mudam nada nas artes.
 | ] · [ | trazer para a frente · mandar para trás ⚙ |
 | K (com 🎬 Animar) | gravar ◆ Chave ⚙ |
 | Espaço (com 🎬 Animar) | tocar / pausar |
+| Shift + Espaço / Shift + ▶ | tocar o contrário do loop, só desta vez ⚙ |
 | `,` e `.` (com 🎬 Animar) | frame anterior / próximo |
 
 ## Bom saber

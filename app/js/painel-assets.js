@@ -11,7 +11,7 @@
 import { S, $, esc, pastaDe, ouvir, aviso } from './base.js';
 import { api, urlArte, urlBiblioteca } from './api.js';
 import { achar, raiz, caminho, visual, eNovo } from './arte.js';
-import { pag, entrada, editar } from './doc.js';
+import { pag, entrada, editar, mudar } from './doc.js';
 import { abrirMenu } from './menu.js';
 import { selecionar } from './selecao.js';
 import { definirEdicao, visivel } from './paineis.js';
@@ -22,6 +22,8 @@ const eItemNovo = (c) => /^#[^/]+$/.test(c);
 const BOTAO_FUNDO = '<button class="fundo" data-acao="fundo" title="Usar como FUNDO da arte: cobre a arte toda e fica atrás de tudo">fundo</button>';
 export const novosSelecionados = () => S.selPaths.some(eItemNovo);
 
+// lê de novo as listas (depois de trazer uma imagem do computador para Assets gerais)
+export const recarregarAssets = () => carregar();
 async function carregar() {
   daArte = S.arquivo;
   try { bibliotecas = (await api.biblioteca()).bibliotecas || []; } catch (e) { bibliotecas = []; }
@@ -55,6 +57,7 @@ function desenhar() {
       <div class="tile" draggable="true" data-tipo="retangulo" title="Retângulo"><div class="forma"></div></div>
       <div class="tile" draggable="true" data-tipo="circulo" title="Círculo"><div class="forma circ"></div></div>
       <div class="tile" draggable="true" data-tipo="texto" title="Texto" style="font:700 22px system-ui;color:#fff">Aa</div>
+      <div class="tile grao" draggable="true" data-tipo="granulado" title="Granulado (grão de filme): cobre a arte toda. Ajustes na aba Forma."><span>Grão</span></div>
     </div></details>`;
   const pasta = pastaDe(S.arquivo);
   const imgs = Object.entries(grupos).map(([g, itens]) => `<details ${aberto(itens.length)}>
@@ -126,12 +129,19 @@ export async function adicionarNovo(dados, x, y) {
     item = { tipo: 'img', src, w: Math.round(w), left: Math.round(cx - w / 2), top: Math.round(cy - h / 2) };
   } else if (dados.tipo === 'texto') {
     item = { tipo: 'texto', html: 'Texto novo', fs: 64, left: Math.round(cx - 170), top: Math.round(cy - 36) };
+  } else if (dados.tipo === 'granulado') {
+    // cobre a arte toda; entra travado (o clique passa por ele) e em "Sobrepor" — ajustes na aba Forma
+    item = { tipo: 'granulado', w: Math.round(r.width), h: Math.round(r.height), left: 0, top: 0, gr: { int: 0.5, tam: 1, cor: false, anim: true } };
   } else {
     const w = dados.tipo === 'circulo' ? 220 : 360, h = dados.tipo === 'circulo' ? 220 : 200;
     item = { tipo: dados.tipo, w, h, left: Math.round(cx - w / 2), top: Math.round(cy - h / 2) };
   }
   const id = proximoId();
   editar((P) => { (P._novos = P._novos || []).push({ id, ...item }); }, { reaplicar: true });
+  if (item.tipo === 'granulado') {
+    mudar((e) => { e.mix = 'overlay'; e.trava = true; }, { em: ['#' + id], historia: false });
+    aviso('granulado: entrou travado (o clique passa por ele) — ajuste na aba Forma, ou selecione pela lista de camadas', '', 6000);
+  }
   selecionar(achar('#' + id));
   return id;
 }

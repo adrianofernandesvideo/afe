@@ -5,9 +5,9 @@
 What already exists, the decisions that guide the project and the ideas for later. Update this file when
 something here is done (and log it in the [CHANGELOG](CHANGELOG.md)).
 
-## Current state — version 2.3 beta (first public version)
+## Current state — version 2.4 beta
 
-**Done and tested** (`python testes/teste_rapido.py --video`: 149 checks passing):
+**Done and tested** (`python testes/teste_rapido.py --video`: 163 checks passing):
 
 - **Open:** any fixed-size `.html` artwork, with pages and automatic refresh on save.
 - **Edit:** select (one or many), move (mouse, arrows, snap to center), size, rotation, opacity, hide, text,
@@ -21,15 +21,18 @@ something here is done (and log it in the [CHANGELOG](CHANGELOG.md)).
   artwork: Shift locks the axis, Alt moves slowly, Ctrl releases the snap.
 - **Effects:** layered glows and shadows, text color, image adjustments, copy/paste effects.
 - **Shape:** corners, fill and outline in a color or gradient.
-- **Layers:** tree, hide, lock, front/back, delete added items.
+- **Layers:** tree, hide, lock, front/back, delete added items, **blend mode** at the top of the list and on the
+  right-click menu.
 - **Assets:** shapes, text, images from the artwork's folder and external **libraries** (`--biblioteca`; the
-  image is copied into the art when used). `placeholders` folders are left out. **Use as background.**
+  image is copied into the art when used). `placeholders` folders are left out. **Use as background.** **Grain** (film grain, animated or
+  not). **Images from the computer:** drop on the artwork (becomes a layer) or on the Assets tab (Assets gerais).
 - **Code components** from a design system (`components/`): an "Escolher peça" (pick a component) window with
   preview and instructions; the component lands in the art as an editable item, with its CSS copied.
 - **Animation:** keyframes (with auto-record), ‹ ◇ › next to the fields, keyframe sheet in frames, easing curve
   per key with a graph, copy/paste and multi-select keys, layer timing (appear/disappear, delay) and Stagger,
   10 entrances, 12 continuous effects, cover frame, duration per page.
-- **Video:** the page as MP4, with optional motion blur (none/light/normal/strong).
+- **Video:** the page as MP4, with optional motion blur (none/light/normal/strong). Play with **loop** (on/off).
+- **Screen:** effects on the left, layers on the right; bottom bar with play in the center; shortcuts as a list.
 - **⚙ Config:** the key for each command and the role of Shift/Alt/Ctrl with the mouse, stored in the browser.
 - Undo/redo (300 steps); saving keeps the previous version.
 - **Distribution:** a release on every push with an executable (Windows, macOS, Linux) and an online demo on GitHub Pages.
@@ -60,7 +63,7 @@ something here is done (and log it in the [CHANGELOG](CHANGELOG.md)).
 - Name layers from the editor (today: `data-nome` in the art's code).
 - Hide the effects that don't apply to the selected element's type.
 - Copy/paste effects from the right-click menu.
-- Drag a file from the computer (image or artwork) into the editor.
+- Drag an ARTWORK (.html) from the computer into the editor (images already work).
 - Export the current frame as PNG.
 
 **Animation**
