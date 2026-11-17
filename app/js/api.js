@@ -1,4 +1,7 @@
 // api.js — conversa com o servidor.py. Só este arquivo conhece os endereços /api/... e /arte/...
+// BASE: o começo do endereço antes de /editor/. No servidor.py é vazio; na demo online (GitHub Pages) é o nome do
+// repositório (ex.: /afe), e lá quem responde os /api/... é o distribuir/demo/sw.js, dentro do navegador.
+export const BASE = location.pathname.replace(/\/editor(\/.*)?$/, '');
 
 async function pedir(url, corpo) {
   const r = await fetch(url, corpo
@@ -11,24 +14,24 @@ async function pedir(url, corpo) {
 }
 
 export const api = {
-  info: () => pedir('/api/info'),
-  artes: () => pedir('/api/artes'),                                           // { itens: [{caminho, ligada}] }
-  assets: (pasta) => pedir('/api/assets?pasta=' + encodeURIComponent(pasta)), // { itens: [caminho dentro da pasta] }
-  biblioteca: () => pedir('/api/biblioteca'),                                 // { bibliotecas: [{nome, pasta, itens}] }
+  info: () => pedir(BASE + '/api/info'),
+  artes: () => pedir(BASE + '/api/artes'),                                           // { itens: [{caminho, ligada}] }
+  assets: (pasta) => pedir(BASE + '/api/assets?pasta=' + encodeURIComponent(pasta)), // { itens: [caminho dentro da pasta] }
+  biblioteca: () => pedir(BASE + '/api/biblioteca'),                                 // { bibliotecas: [{nome, pasta, itens}] }
   // copia uma imagem da biblioteca para a pasta da arte → { src } (caminho a partir da pasta da arte)
-  usarAsset: (arquivo, biblioteca, asset) => pedir('/api/usar-asset', { arquivo, biblioteca, asset }),
-  pecas: () => pedir('/api/pecas'),                                           // { bibliotecas: [{nome, pasta, css, pecas}] }
+  usarAsset: (arquivo, biblioteca, asset) => pedir(BASE + '/api/usar-asset', { arquivo, biblioteca, asset }),
+  pecas: () => pedir(BASE + '/api/pecas'),                                           // { bibliotecas: [{nome, pasta, css, pecas}] }
   // prepara a arte para uma peça: copia o CSS da marca e as imagens dela → { css: [...], imagens: {pedida: caminho} }
-  usarPeca: (arquivo, biblioteca, imagens) => pedir('/api/usar-peca', { arquivo, biblioteca, imagens }),
-  marcas: (arquivo) => pedir('/api/marcas?arquivo=' + encodeURIComponent(arquivo)),   // { marca } muda se o arquivo mudar
-  salvar: (arquivo, edicoes) => pedir('/api/salvar', { arquivo, edicoes }),
-  video: (arquivo, pagina) => pedir('/api/video', { arquivo, pagina }),      // { id }
-  videoStatus: (id) => pedir('/api/video-status?id=' + encodeURIComponent(id)),
+  usarPeca: (arquivo, biblioteca, imagens) => pedir(BASE + '/api/usar-peca', { arquivo, biblioteca, imagens }),
+  marcas: (arquivo) => pedir(BASE + '/api/marcas?arquivo=' + encodeURIComponent(arquivo)),   // { marca } muda se o arquivo mudar
+  salvar: (arquivo, edicoes) => pedir(BASE + '/api/salvar', { arquivo, edicoes }),
+  video: (arquivo, pagina) => pedir(BASE + '/api/video', { arquivo, pagina }),      // { id }
+  videoStatus: (id) => pedir(BASE + '/api/video-status?id=' + encodeURIComponent(id)),
 };
 
 // endereço de um arquivo da pasta das artes (a arte, uma imagem, um vídeo gerado)
-export const urlArte = (rel) => '/arte/' + rel.split('/').map(encodeURIComponent).join('/');
+export const urlArte = (rel) => BASE + '/arte/' + rel.split('/').map(encodeURIComponent).join('/');
 // endereço de um arquivo do design system de uma biblioteca (a prévia de uma peça, o README dela...)
-export const urlDs = (nome, rel) => '/ds/' + encodeURIComponent(nome) + '/' + rel.split('/').map(encodeURIComponent).join('/');
+export const urlDs = (nome, rel) => BASE + '/ds/' + encodeURIComponent(nome) + '/' + rel.split('/').map(encodeURIComponent).join('/');
 // endereço de uma imagem de uma biblioteca de assets (miniatura)
-export const urlBiblioteca = (nome, rel) => '/bib/' + encodeURIComponent(nome) + '/' + rel.split('/').map(encodeURIComponent).join('/');
+export const urlBiblioteca = (nome, rel) => BASE + '/bib/' + encodeURIComponent(nome) + '/' + rel.split('/').map(encodeURIComponent).join('/');

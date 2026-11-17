@@ -29,6 +29,13 @@ Obrigado por querer melhorar o AFE! Relatos de uso, ideias e correções ajudam 
 - **Mudou a biblioteca das artes** (`arte/edicoes-lib.js`)? Suba a revisão em três lugares: o comentário do
   topo, `const VERSAO` e `LIB_ATUAL` em `app/js/arte.js`. Copie o arquivo também para `exemplo/`.
 
+## Releases e demo online (automáticos)
+
+Cada push na `main` gera um **release novo** com o executável para Windows, macOS e Linux, e atualiza a **demo
+online** (GitHub Pages). Para um commit não gerar nada, ponha `[skip ci]` na mensagem. A versão-base é a
+`VERSAO` do `servidor.py`: ao mudar para `2.4`, os releases recomeçam em `2.4.0-beta`. Detalhes em
+[distribuir/LEIA.md](distribuir/LEIA.md).
+
 ## Convenções
 
 - Sem dependências: o servidor usa só a biblioteca padrão do Python, e a tela é JavaScript puro (módulos ES),

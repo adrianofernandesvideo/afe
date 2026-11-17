@@ -42,7 +42,19 @@ O editor não instala nada sozinho: se faltar algo, ele avisa o quê.
 > Desenvolvido e usado no **Windows** com Python 3.14. macOS, Linux e versões mais antigas do Python ainda não
 > foram testados — relatos e correções são bem-vindos.
 
-## Começar em 2 minutos
+## Experimentar sem instalar nada
+
+- **Demo online:** **https://adrianofernandesvideo.github.io/afe/** — o editor de verdade, no navegador, com as
+  artes de demonstração. As edições ficam só no seu navegador (dá para baixá-las). Gerar vídeo e as bibliotecas
+  de assets só funcionam no AFE baixado.
+- **Executável:** na página de [Releases](https://github.com/adrianofernandesvideo/afe/releases), baixe o `.zip`
+  do seu sistema (Windows, macOS ou Linux), descompacte e dê dois cliques em **AFE**. Não precisa de Python. Para
+  usar com uma arte sua, arraste o `.html` dela em cima do AFE.
+
+Cada push na `main` gera sozinho um release novo (`2.3.0-beta`, `2.3.1-beta`…) e atualiza a demo online — veja
+[distribuir/LEIA.md](distribuir/LEIA.md).
+
+## Começar em 2 minutos (com Python)
 
 Dentro da pasta do AFE:
 

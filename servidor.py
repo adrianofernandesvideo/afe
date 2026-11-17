@@ -45,6 +45,7 @@ import json
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import threading
@@ -58,8 +59,11 @@ for _fluxo in (sys.stdout, sys.stderr):
     except Exception:  # noqa: BLE001
         pass
 
-VERSAO = "2.0"
-AQUI = Path(__file__).resolve().parent
+VERSAO = "2.3"                         # (no executavel dos releases vira a versao completa, ex.: 2.3.4-beta)
+# CONGELADO = rodando como executavel (AFE.exe, feito pelo PyInstaller nos releases do GitHub). Ai os arquivos
+# do editor (app/, arte/, render_anim.py) vem de dentro do executavel, e as artes ficam ao lado dele.
+CONGELADO = bool(getattr(sys, "frozen", False))
+AQUI = Path(getattr(sys, "_MEIPASS", Path(__file__).parent)).resolve()   # (resolve: nome longo da pasta, ex.: ADRIAN~1)
 APP = AQUI / "app"
 RAIZ = Path.cwd()                      # definido de verdade em main()
 PORTA = 8765
@@ -456,9 +460,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         script = AQUI / "render_anim.py"
         if not arte or not script.is_file():
             return self.responder(404, {"erro": "arte ou gerador de video nao encontrado"})
+        python = python_para_video()
+        if not python:
+            return self.responder(501, {"erro": "gerar video precisa do Python 3 com Playwright e do ffmpeg "
+                                                "instalados neste computador (veja o LEIA)"})
         pagina = int(pedido.get("pagina") or 1)
         proc = subprocess.Popen(
-            [sys.executable, "-u", str(script), str(arte), "--pagina", str(pagina)],
+            python + ["-u", str(script), str(arte), "--pagina", str(pagina)],
             cwd=str(arte.parent), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, encoding="utf-8", errors="replace",
             env={**os.environ, "PYTHONIOENCODING": "utf-8"})
@@ -482,15 +490,65 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.responder(200, {"ok": True, "id": vid})
 
 
+class Servidor(http.server.ThreadingHTTPServer):
+    """O servidor HTTP do AFE. No Windows, "reusar o endereco" deixaria dois programas ouvindo a mesma porta
+    (e o editor falaria com o errado): la a porta e pedida com exclusividade, e se estiver ocupada da erro."""
+    allow_reuse_address = sys.platform != "win32"
+
+    def server_bind(self):
+        if sys.platform == "win32" and hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
+
+
+def python_para_video():
+    """Comando do Python que roda o render_anim.py. No executavel nao ha Python dentro: usa o do computador,
+    se houver (o video tambem precisa do Playwright e do ffmpeg). Devolve uma lista ou None."""
+    if not CONGELADO:
+        return [sys.executable]
+    pastas = [d for d in os.environ.get("PATH", "").split(os.pathsep)
+              if d and "WindowsApps" not in d]        # (o "python" falso da Microsoft Store so abre a loja)
+    for nome, extra in (("python3", []), ("python", []), ("py", ["-3"])):
+        for pasta in pastas:
+            achado = shutil.which(nome, path=pasta)
+            if achado:
+                return [achado, *extra]
+    return None
+
+
+def raiz_padrao():
+    """Pasta das artes quando --raiz nao e dado: a atual; no executavel, a pasta 'artes' ao lado dele."""
+    if not CONGELADO:
+        return Path(".")
+    perto = Path(sys.executable).resolve().parent
+    return perto / "artes" if (perto / "artes").is_dir() else perto
+
+
+def ligar_arte(args):
+    """Roda o ligar.py (que vai dentro do executavel) com estes argumentos."""
+    sys.argv = ["ligar", *args]
+    import ligar  # noqa: F401  (o ligar.py roda ao ser importado)
+
+
 def main():
     global RAIZ, PORTA
+    abrir_arte = ""
+    if CONGELADO and sys.argv[1:2] == ["ligar"]:      # AFE ligar arte.html  = o ligar.py, de dentro do executavel
+        return ligar_arte(sys.argv[2:])
+    if CONGELADO and len(sys.argv) == 2 and sys.argv[1].lower().endswith(".html") and Path(sys.argv[1]).is_file():
+        # arte arrastada em cima do executavel: liga (se ainda nao estiver) e abre o editor na pasta dela
+        arte = Path(sys.argv[1]).resolve()
+        ligar_arte([str(arte)])
+        sys.argv = [sys.argv[0], "--raiz", str(arte.parent)]
+        abrir_arte = "?arquivo=" + urllib.parse.quote(arte.name)
     ap = argparse.ArgumentParser(description="AFE: servidor local")
-    ap.add_argument("--raiz", default=".", help="pasta onde ficam as artes .html (padrao: a pasta atual)")
-    ap.add_argument("--porta", type=int, default=8765)
+    ap.add_argument("--raiz", default=None, help="pasta onde ficam as artes .html (padrao: a pasta atual)")
+    ap.add_argument("--porta", type=int, default=None, help="porta (padrao: 8765)")
+    ap.add_argument("--abrir", action="store_true", help="abre o editor no navegador (o executavel sempre abre)")
     ap.add_argument("--biblioteca", action="append", default=[], metavar="[NOME=]PASTA",
                     help="pasta de imagens que aparece na aba Assets de todas as artes (pode repetir)")
     a = ap.parse_args()
-    RAIZ, PORTA = Path(a.raiz).resolve(), a.porta
+    RAIZ, PORTA = (Path(a.raiz) if a.raiz else raiz_padrao()).resolve(), a.porta or PORTA
     if not RAIZ.is_dir():
         sys.exit(f"Pasta das artes nao encontrada: {RAIZ}")
     for item in a.biblioteca:
@@ -504,11 +562,25 @@ def main():
                             "ds": ds_de(raiz)})
     if not (APP / "index.html").is_file():
         sys.exit(f"Nao achei a tela do editor em {APP} (a pasta do editor esta completa?)")
-    srv = http.server.ThreadingHTTPServer(("127.0.0.1", PORTA), Handler)
+    # porta ocupada (outro AFE aberto?): sem --porta, tenta as seguintes
+    for tentativa in range(10):
+        try:
+            srv = Servidor(("127.0.0.1", PORTA), Handler)
+            break
+        except OSError:
+            if a.porta or tentativa == 9:
+                sys.exit(f"A porta {PORTA} esta ocupada. Feche o outro programa ou use --porta OUTRA.")
+            PORTA += 1
     print(f"AFE {VERSAO}\n  artes: {RAIZ}", flush=True)
     for b in BIBLIOTECAS:
         print(f"  biblioteca \"{b['nome']}\": {b['raiz']}" + (f"  (+ pecas em {b['ds'] / 'components'})" if b["ds"] else ""), flush=True)
     print(f"  abra:  http://localhost:{PORTA}/editor/", flush=True)
+    if a.abrir or CONGELADO:
+        import webbrowser
+        if not os.environ.get("AFE_NAO_ABRIR"):          # (o teste do release liga o executavel sem navegador)
+            threading.Timer(0.6, webbrowser.open, [f"http://localhost:{PORTA}/editor/{abrir_arte}"]).start()
+    if CONGELADO:
+        print("  (deixe esta janela aberta enquanto usa o editor; para fechar, feche a janela)", flush=True)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
@@ -516,4 +588,17 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if not CONGELADO:
+        main()
+    else:
+        # no executavel aberto com dois cliques, a janela fecharia antes de dar para ler um erro: espera o Enter
+        try:
+            main()
+        except SystemExit as fim:
+            if fim.code not in (None, 0):
+                print(fim.code if isinstance(fim.code, str) else f"(saiu com erro {fim.code})", flush=True)
+                try:
+                    input("\nAperte Enter para fechar.")
+                except EOFError:
+                    pass
+                raise

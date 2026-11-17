@@ -4,6 +4,23 @@
 
 Newest on top. When you change something, add a line here (in both languages).
 
+## 2.3 beta — 2026-11-16 · automatic releases, executable and online demo
+
+- **A release on every push** (`.github/workflows/release.yml`): each push to `main` creates a new release with
+  a number that never repeats (`<servidor.py VERSAO>.<n>-beta`), automatic notes and the **executable** for
+  Windows, macOS and Linux (`distribuir/empacotar.py`, with PyInstaller on GitHub's machine). Each executable is
+  started and tested before publishing.
+- **Executable:** opens the browser by itself, uses the `artes/` folder next to it, accepts an `.html` artwork
+  dragged onto it (connects and opens it) and `AFE ligar art.html`. If the port is busy, it tries the next one.
+  Rendering video uses the computer's Python, if there is one.
+- **Online demo** (`.github/workflows/demo-online.yml`, GitHub Pages): the real editor with the artworks in
+  `demos/artes`. A *service worker* (`distribuir/demo/sw.js`) plays the server's role inside the browser; edits
+  stay only in the tester's browser, with "download my edits" and "back to the original".
+- **App:** the addresses (`/api`, `/arte`…) now respect the folder the editor lives in (`BASE` in `api.js`), so
+  it works at `user.github.io/afe/`.
+- **Server:** on Windows the port is requested exclusively (before, two programs could listen on the same port);
+  `VERSAO` = 2.3; `--abrir` option.
+
 ## 2.3 beta — 2026-11-16 · first public version (beta)
 
 First open-source version. The editor was born inside a private media-production project; the versions below

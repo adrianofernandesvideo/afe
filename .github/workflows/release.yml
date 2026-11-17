@@ -1,0 +1,108 @@
+# Release a cada push na main
+# ----------------------------------------------------------------------------------------------------
+# A cada push na main — varios commits enviados juntos geram um release so — (ou rodando a mao em Actions -> "Release" -> Run workflow):
+#   1. escolhe a proxima versao, sem nunca repetir uma que ja existe:
+#        <VERSAO do servidor.py>.<numero>-<CANAL>   ex.: 2.3.0-beta, 2.3.1-beta, 2.3.2-beta...
+#      (o numero e o maior ja usado + 1; ao mudar VERSAO no servidor.py para 2.4, recomeca em 2.4.0)
+#   2. gera o executavel em Windows, macOS e Linux (distribuir/empacotar.py) e testa cada um;
+#   3. cria o release no GitHub com os tres .zip e as notas automaticas (commits desde o ultimo release).
+# Releases antigos nunca sao trocados nem apagados.
+# Para um commit NAO gerar release, ponha [skip ci] na mensagem do commit.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# um release de cada vez (dois commits seguidos nao disputam o mesmo numero)
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  CANAL: beta          # sufixo das versoes. Quando o AFE sair do beta: deixe vazio (CANAL: "")
+
+jobs:
+  versao:
+    name: Escolher a versão
+    runs-on: ubuntu-latest
+    outputs:
+      versao: ${{ steps.v.outputs.versao }}
+      tag: ${{ steps.v.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: v
+        name: Próxima versão livre
+        run: |
+          base=$(sed -nE 's/^VERSAO = "([0-9]+(\.[0-9]+)*)".*/\1/p' servidor.py)
+          if [ -z "$base" ]; then echo "nao achei VERSAO no servidor.py"; exit 1; fi
+          git fetch --tags --force --quiet
+          escapada=${base//./\\.}
+          ultimo=$(git tag -l "v${base}.*" | sed -nE "s/^v${escapada}\.([0-9]+)(-.*)?$/\1/p" | sort -n | tail -1)
+          n=$(( ${ultimo:--1} + 1 ))
+          versao="${base}.${n}${CANAL:+-$CANAL}"
+          while git rev-parse -q --verify "refs/tags/v$versao" >/dev/null; do
+            n=$((n + 1)); versao="${base}.${n}${CANAL:+-$CANAL}"
+          done
+          echo "versao=$versao" >> "$GITHUB_OUTPUT"
+          echo "tag=v$versao" >> "$GITHUB_OUTPUT"
+          echo "### Versão: v$versao" >> "$GITHUB_STEP_SUMMARY"
+
+  executavel:
+    name: Executável (${{ matrix.sistema }})
+    needs: versao
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: windows-latest, sistema: windows }
+          - { os: macos-latest, sistema: macos }
+          - { os: ubuntu-latest, sistema: linux }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar o PyInstaller (só na máquina do GitHub)
+        run: python -m pip install --disable-pip-version-check pyinstaller==6.22.3
+      - name: Gerar e testar o executável
+        run: python distribuir/empacotar.py --versao "${{ needs.versao.outputs.versao }}" --sistema ${{ matrix.sistema }} --saida build/release --testar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: afe-${{ matrix.sistema }}
+          path: build/release/*.zip
+          if-no-files-found: error
+
+  release:
+    name: Publicar o release
+    needs: [versao, executavel]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: afe-*
+          merge-multiple: true
+          path: dist
+      - name: Criar o release (sem trocar nenhum que já exista)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.versao.outputs.tag }}
+          VERSAO: ${{ needs.versao.outputs.versao }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "o release $TAG ja existe: nada a fazer (nunca e sobrescrito)"; exit 1
+          fi
+          gh release create "$TAG" dist/*.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "AFE $VERSAO" \
+            --generate-notes \
+            ${CANAL:+--prerelease}

@@ -1,0 +1,48 @@
+AFE {{VERSAO}} — editor visual para artes HTML feitas por IA (beta)
+=====================================================================
+(English below)
+
+COMO ABRIR
+  1. Descompacte esta pasta (não rode de dentro do .zip).
+  2. Dê dois cliques em AFE (AFE.exe no Windows).
+     Abre uma janela preta (é o AFE funcionando) e o editor abre no navegador,
+     já com as artes de demonstração da pasta "artes".
+  3. Para fechar o AFE, feche a janela preta.
+
+  Primeira vez:
+  - Windows: se aparecer "O Windows protegeu o computador", clique em
+    "Mais informações" → "Executar assim mesmo" (o AFE ainda não tem assinatura digital).
+  - macOS: clique com o botão direito em AFE → Abrir → Abrir.
+  - Linux: rode ./AFE num terminal, dentro desta pasta.
+
+USAR COM AS SUAS ARTES
+  - Arraste o arquivo .html da sua arte em cima do AFE: ele liga a arte ao editor
+    (acrescenta duas linhas <script> no .html e cria o <arte>.edicoes.js ao lado)
+    e abre o editor na pasta dela.
+  - Ou coloque a arte dentro da pasta "artes" e rode, num terminal:  AFE ligar artes/minha-arte.html
+  - A arte precisa ter tamanho fixo (ex.: 1080x1350). Detalhes no README do projeto.
+
+GERAR VÍDEO
+  O botão de vídeo precisa, além do AFE, do Python 3 com Playwright e do ffmpeg
+  instalados no computador. Sem eles, todo o resto funciona.
+
+Código, documentação e novidades: https://github.com/adrianofernandesvideo/afe
+Licença: AGPL-3.0 (arquivo LICENSE). Copyright (C) 2026 Adriano Fernandes.
+
+---------------------------------------------------------------------
+AFE {{VERSAO}} — a visual editor for HTML artwork made by AI (beta)
+
+HOW TO OPEN
+  1. Unzip this folder (don't run it from inside the .zip).
+  2. Double-click AFE (AFE.exe on Windows). A black window opens (that's AFE
+     running) and the editor opens in your browser with the demo artwork.
+  3. To quit, close the black window.
+  First time: on Windows click "More info" -> "Run anyway"; on macOS right-click
+  AFE -> Open -> Open; on Linux run ./AFE in a terminal.
+
+YOUR OWN ARTWORK
+  Drag your art's .html file onto AFE: it connects the art to the editor and opens it.
+  (The editor's interface is in Portuguese for now; the docs on GitHub are in English too.)
+
+VIDEO
+  Rendering video also needs Python 3 with Playwright and ffmpeg installed.

@@ -32,6 +32,7 @@ something here is done (and log it in the [CHANGELOG](CHANGELOG.md)).
 - **Video:** the page as MP4, with optional motion blur (none/light/normal/strong).
 - **⚙ Config:** the key for each command and the role of Shift/Alt/Ctrl with the mouse, stored in the browser.
 - Undo/redo (300 steps); saving keeps the previous version.
+- **Distribution:** a release on every push with an executable (Windows, macOS, Linux) and an online demo on GitHub Pages.
 - Portable: a single folder, server with `--raiz`, `ligar.py`, sample artwork, automated test.
 
 ## Decisions that guide the project

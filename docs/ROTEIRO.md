@@ -32,6 +32,7 @@ algo daqui ficar pronto (e registre no [CHANGELOG](CHANGELOG.md)).
 - **Vídeo:** MP4 da página, com motion blur opcional (sem/leve/normal/forte).
 - **⚙ Config:** tecla de cada comando e papel de Shift/Alt/Ctrl no mouse, guardados no navegador.
 - Desfazer/refazer (300 passos); salvar guarda a versão anterior.
+- **Distribuição:** release a cada push com executável (Windows, macOS, Linux) e demo online no GitHub Pages.
 - Portátil: pasta única, servidor com `--raiz`, `ligar.py`, arte de exemplo, teste automático.
 
 ## Decisões que guiam o projeto

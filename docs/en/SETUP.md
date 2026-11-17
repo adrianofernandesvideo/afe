@@ -28,6 +28,10 @@ in the editor, in the browser, or when rendering the PNG/video.
 
 ## Opening the editor
 
+> **No Python?** Download the executable from the GitHub *Releases* page (Windows, macOS or Linux), unzip it and
+> double-click **AFE**: it opens the editor with the artworks in the `artes/` folder next to it. For your own
+> artwork, drag its `.html` onto AFE. There's also the online demo (link in the README).
+
 All commands run **from inside the AFE folder** (your artworks can live anywhere):
 
 ```bash
@@ -125,7 +129,9 @@ something is missing, and never installs anything by itself. The automated test 
     js/                   behavior, one file per topic (start with main.js)
   arte/edicoes-lib.js   library that goes inside each artwork (ligar.py copies it)
   exemplo/              minimal artwork for testing and as a template
-  demos/                demo artworks (under construction)
+  demos/                demo artworks (a post and a carousel about AFE)
+  distribuir/           builds the executable and the online demo (used by the .github/ workflows)
+  .github/workflows/    a release on every push + the online demo on GitHub Pages
   testes/teste_rapido.py  the editor's automated check
   docs/                 manual, architecture, roadmap, discoveries, history (docs/en/ = English)
 ```

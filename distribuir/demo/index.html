@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AFE — demo online</title>
+<meta name="description" content="AFE: editor visual para artes HTML feitas por IA. Demo online (beta).">
+<link rel="icon" href="data:,">
+<style>
+  html, body { margin:0; height:100%; background:#0b0b14; color:#e8e8f0; font:15px system-ui, sans-serif; }
+  main { min-height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:24px; box-sizing:border-box; text-align:center; }
+  h1 { margin:0; font-size:44px; letter-spacing:.04em; }
+  h1 sup { font-size:14px; color:#ff4d82; letter-spacing:.1em; }
+  p { margin:0; color:#a8a8bc; max-width:460px; line-height:1.5; }
+  a { color:#3df5ff; }
+  .giro { width:26px; height:26px; border:3px solid #2a2a40; border-top-color:#3df5ff; border-radius:50%; animation:g 0.8s linear infinite; }
+  @keyframes g { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<main>
+  <h1>AFE <sup>BETA</sup></h1>
+  <div class="giro" id="giro"></div>
+  <p id="msg">Abrindo a demo online… <br><small>Opening the online demo…</small></p>
+</main>
+<script>
+  // Liga o sw.js (o "servidor" da demo, dentro do navegador) e só então abre o editor com a arte de exemplo.
+  (async function () {
+    const msg = document.getElementById('msg');
+    const falhar = (t) => { document.getElementById('giro').remove(); msg.innerHTML = t; };
+    if (!navigator.serviceWorker) return falhar('Este navegador não deixa a demo funcionar. Tente o Chrome, o Edge ou o Firefox (fora da janela anônima).');
+    try {
+      await navigator.serviceWorker.register('sw.js', { scope: './' });
+      await navigator.serviceWorker.ready;
+      location.replace('editor/?arquivo={{ARTE}}');
+    } catch (e) {
+      falhar('Não deu para abrir a demo neste navegador (janela anônima ou cookies bloqueados?).');
+    }
+  })();
+</script>
+</body>
+</html>

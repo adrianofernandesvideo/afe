@@ -1,0 +1,59 @@
+# Demo online (beta test) no GitHub Pages
+# ----------------------------------------------------------------------------------------------------
+# A cada push na main, monta o site da demo (distribuir/montar_site.py) e publica no GitHub Pages:
+#   https://<usuario>.github.io/<repositorio>/
+# A demo roda o editor de verdade, com as artes de demos/artes. As edicoes ficam so no navegador de quem
+# testa (nada e enviado). Gerar video e as bibliotecas de assets so funcionam no AFE baixado.
+#
+# Antes da primeira vez (uma vez so):
+#   - o repositorio precisa ser PUBLICO (no plano gratis, o GitHub Pages nao funciona em repositorio privado);
+#     enquanto for privado, este workflow pula a publicacao sem dar erro;
+#   - Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# Cada publicacao aparece em "Deployments" (ambiente github-pages), na pagina do repositorio.
+
+name: Demo online
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# so a publicacao mais nova importa
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  montar:
+    name: Montar o site da demo
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Montar
+        run: |
+          base=$(sed -nE 's/^VERSAO = "([^"]+)".*/\1/p' servidor.py)
+          python distribuir/montar_site.py --saida build/site --versao "${base}-demo+${GITHUB_SHA::7}"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/site
+
+  publicar:
+    name: Publicar no GitHub Pages
+    needs: montar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicado.outputs.page_url }}
+    steps:
+      - id: publicado
+        uses: actions/deploy-pages@v4

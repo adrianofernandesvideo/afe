@@ -32,6 +32,13 @@ Thanks for wanting to improve AFE! Usage reports, ideas and fixes all help.
 - **Changed the artwork library** (`arte/edicoes-lib.js`)? Bump its revision in three places: the header
   comment, `const VERSAO`, and `LIB_ATUAL` in `app/js/arte.js`. Copy the file to `exemplo/` as well.
 
+## Releases and the online demo (automatic)
+
+Every push to `main` creates a **new release** with the executable for Windows, macOS and Linux, and updates
+the **online demo** (GitHub Pages). To skip both for a commit, put `[skip ci]` in its message. The base version
+is `VERSAO` in `servidor.py`: change it to `2.4` and releases restart at `2.4.0-beta`. Details in
+[distribuir/LEIA.md](distribuir/LEIA.md).
+
 ## Conventions
 
 - No dependencies: the server uses only Python's standard library, and the interface is plain JavaScript

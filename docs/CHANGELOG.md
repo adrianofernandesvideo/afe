@@ -4,6 +4,23 @@
 
 Mais novo em cima. Ao mudar algo, acrescente uma linha aqui (e na versão em inglês).
 
+## 2.3 beta — 2026-11-16 · releases automáticos, executável e demo online
+
+- **Release a cada push** (`.github/workflows/release.yml`): cada push na `main` cria um release novo, com
+  número que nunca se repete (`<VERSAO do servidor.py>.<n>-beta`), notas automáticas e o **executável** para
+  Windows, macOS e Linux (`distribuir/empacotar.py`, com PyInstaller na máquina do GitHub). Cada executável é
+  ligado e testado antes de publicar.
+- **Executável:** abre o navegador sozinho, usa a pasta `artes/` ao lado dele, aceita uma arte `.html` arrastada
+  em cima (liga e abre) e `AFE ligar arte.html`. Se a porta estiver ocupada, tenta a seguinte. Gerar vídeo usa
+  o Python do computador, se houver.
+- **Demo online** (`.github/workflows/demo-online.yml`, GitHub Pages): o editor de verdade com as artes de
+  `demos/artes`. Um *service worker* (`distribuir/demo/sw.js`) faz o papel do servidor dentro do navegador; as
+  edições ficam só no navegador de quem testa, com "baixar minhas edições" e "voltar ao original".
+- **App:** os endereços (`/api`, `/arte`…) passam a respeitar a pasta em que o editor está (`BASE` em `api.js`),
+  para funcionar em `usuario.github.io/afe/`.
+- **Servidor:** no Windows, a porta é pedida com exclusividade (antes, dois programas podiam ouvir a mesma porta);
+  `VERSAO` = 2.3; opção `--abrir`.
+
 ## 2.3 beta — 2026-11-16 · primeira versão pública (beta)
 
 Primeira versão em código aberto. O editor nasceu dentro de um projeto privado de produção de mídia; as

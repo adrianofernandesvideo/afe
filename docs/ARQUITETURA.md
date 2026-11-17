@@ -157,6 +157,21 @@ arquivos (a prévia sai com `<base>` e os `<link>` do CSS já postos); `POST /ap
 o CSS (sem `@import` de endereços da internet) e as imagens pedidas. A prévia roda na mesma origem do
 editor (como a arte): só aponte `--biblioteca` para pastas em que você confia.
 
+**Executável** (releases): o mesmo `servidor.py`, empacotado pelo PyInstaller (`distribuir/empacotar.py`).
+`CONGELADO` diz se é o executável; aí `AQUI` é a pasta interna do pacote (`sys._MEIPASS`, com `app/`, `arte/` e
+`render_anim.py`), a `--raiz` padrão é a pasta `artes/` ao lado do executável, o navegador abre sozinho e
+`AFE ligar arte.html` (ou arrastar a arte em cima) roda o `ligar.py` que vai dentro. O vídeo procura um Python
+de verdade no PATH (`python_para_video`).
+
+### Demo online (GitHub Pages)
+
+`distribuir/montar_site.py` monta um site só de arquivos: `editor/` (o `app/` + `demo.js`), `arte/` (as
+`demos/artes`), `demo-indice.json` (as listas que o servidor faria) e `sw.js`. O **service worker** faz o papel
+do servidor dentro do navegador: responde `/api/...` e entrega o `<arte>.edicoes.js` salvo no Cache Storage do
+navegador (ou o original). Por isso o app **nunca** usa endereços fixos: tudo passa por `api.js`, que põe a
+`BASE` (a pasta antes de `/editor/`; vazia no servidor.py, `/afe` no Pages). Rota nova no servidor → responda
+também no `sw.js` (nem que seja com o aviso "não disponível na demo").
+
 ## 5. O app — módulos
 
 Tudo em `app/js/`. Cada arquivo começa com um comentário dizendo o que faz. Dependem só "para baixo":

@@ -163,6 +163,21 @@ serves the files (the preview comes with `<base>` and the CSS `<link>` tags alre
 images. The preview runs on the editor's origin (like the art): only point `--biblioteca` at folders you
 trust.
 
+**Executable** (releases): the same `servidor.py`, packaged by PyInstaller (`distribuir/empacotar.py`).
+`CONGELADO` tells whether it's the executable; then `AQUI` is the package's inner folder (`sys._MEIPASS`, with
+`app/`, `arte/` and `render_anim.py`), the default `--raiz` is the `artes/` folder next to the executable, the
+browser opens by itself, and `AFE ligar art.html` (or dropping the art onto it) runs the bundled `ligar.py`.
+Video looks for a real Python on the PATH (`python_para_video`).
+
+### Online demo (GitHub Pages)
+
+`distribuir/montar_site.py` builds a files-only site: `editor/` (`app/` + `demo.js`), `arte/` (the
+`demos/artes`), `demo-indice.json` (the lists the server would make) and `sw.js`. The **service worker** plays
+the server inside the browser: it answers `/api/...` and serves the `<art>.edicoes.js` saved in the browser's
+Cache Storage (or the original). That's why the app **never** uses fixed addresses: everything goes through
+`api.js`, which adds the `BASE` (the folder before `/editor/`; empty with servidor.py, `/afe` on Pages). New
+server route → answer it in `sw.js` too (even if only with a "not available in the demo" notice).
+
 ## 5. The app — modules
 
 Everything in `app/js/`. Each file starts with a comment saying what it does. Dependencies only go "down":

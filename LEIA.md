@@ -25,6 +25,10 @@ abre — no editor, no navegador ou na hora de gerar o PNG/vídeo.
 
 ## Abrir o editor
 
+> **Sem Python?** Baixe o executável na página de *Releases* do GitHub (Windows, macOS ou Linux), descompacte e
+> dê dois cliques em **AFE**: ele abre o editor com as artes da pasta `artes/` ao lado dele. Para uma arte sua,
+> arraste o `.html` dela em cima do AFE. Também há a demo online (link no README).
+
 Todos os comandos rodam **de dentro da pasta do AFE** (as artes podem ficar em qualquer lugar):
 
 ```bash
@@ -120,7 +124,9 @@ não instala nada sozinho. O teste automático usa o Playwright.
     js/                   comportamento, um arquivo por assunto (comece por main.js)
   arte/edicoes-lib.js   biblioteca que vai dentro de cada arte (o ligar.py copia)
   exemplo/              arte mínima para testar e servir de modelo
-  demos/                artes de demonstração (em construção)
+  demos/                artes de demonstração (post e carrossel sobre o AFE)
+  distribuir/           monta o executável e a demo online (os workflows de .github/ usam)
+  .github/workflows/    release a cada push + demo online no GitHub Pages
   testes/teste_rapido.py  conferência automática do editor
   docs/                 manual, arquitetura, roteiro, descobertas, histórico (docs/en/ = em inglês)
 ```
