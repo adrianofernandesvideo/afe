@@ -9,7 +9,7 @@
 >
 > **Beta:** funciona e tem teste automático, mas ainda pode ter arestas. Se algo quebrar, abra uma *issue*.
 
-Acesse o live preview agora mesmo [clicando aqui.](https://adrianofernandesvideo.github.io/afe/editor/?arquivo=afe-post.html&pagina=1)
+Acesse o live preview agora mesmo [clicando aqui.](https://adrianofernandesvideo.github.io/afe/)
 
 Editor visual para artes feitas em HTML — posts, carrosséis, stories, banners. Você abre a arte no
 navegador e ajusta **com o mouse**, sem mexer no código: mover, mudar tamanho e texto, glows e sombras,
