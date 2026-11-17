@@ -10,6 +10,8 @@
 > **Beta:** it works and has an automated test, but there may still be rough edges. If something breaks, please
 > open an *issue*.
 
+Try live preview right now by [clicking here.](https://adrianofernandesvideo.github.io/afe/editor/?arquivo=afe-post.html&pagina=1)
+
 A visual editor for artwork made in HTML — social posts, carousels, stories, banners. You open the art in the
 browser and adjust it **with the mouse**, without touching its code: move, resize and retype, glows and
 shadows, corners and outlines, add images and shapes, animate with keyframes and render the video.
